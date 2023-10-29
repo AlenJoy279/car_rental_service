@@ -7,11 +7,11 @@ class carsDB():
         self.conn.execute('PRAGMA foreign_keys = ON')
         self.curs = self.conn.cursor()
         self.default_cars = [
-            (None, 'Volvo', 'C40', 2021, 'MPV', 'automatic', 'electric', '3902', 4, 65, 'rented', 115, 400),
+            (None, 'Volvo', 'C40', 2021, 'MPV', 'automatic', 'electric', '3902', 4, 65, 'available', 115, 400),
             (None, 'Ford', 'EcoSport', 2020, 'Sedan', 'manual', 'petrol', '6412', 4, 45, 'rented', 90, None),
             (None, 'Toyota', 'Prius', 2017, 'SUV', 'automatic', 'electric', '4923', 5, 50, 'available', 80, 500),
             (None, 'Ford', 'F-150', 2022, 'Van', 'manual', 'petrol', '3489', 3, 80, 'maintenance', 150, None),
-            (None, 'BMW', 'M2 Coupe', 2016, 'SUV', 'manual', 'diesel', '2190', 4, 40, 'rented', 170, None),
+            (None, 'BMW', 'M2 Coupe', 2016, 'SUV', 'manual', 'diesel', '2190', 4, 40, 'available', 170, None),
         ]
         
     def init_db(self):
