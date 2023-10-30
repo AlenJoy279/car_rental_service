@@ -19,6 +19,8 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Chip from '@mui/material/Chip';
 import OutlinedInput from '@mui/material/OutlinedInput';
+import Slider from '@mui/material/Slider';
+import Stack from '@mui/joy/Stack';
 
 const defaultTheme = createTheme();
 
@@ -46,6 +48,12 @@ export default function SignIn() {
         setTOption(event.target.value);
     };
 
+    const [powertrainOptions, setPowertrainOption] = React.useState('Any'); // Transmission options
+
+    const handlePowertrainChange = (event) => {
+        setPowertrainOption(event.target.value);
+    };
+
     const [manufacturerName, setManufacturerName] = React.useState([]);
 
     const handleManufacturerSel = (event) => {
@@ -69,7 +77,7 @@ export default function SignIn() {
         },
     };
 
-    const manufacturers = [
+    const manufacturers = [ // placeholder until db is populated
         'Audi',
         'Bentley',
         'BMW',
@@ -86,6 +94,37 @@ export default function SignIn() {
         'Tesla',
         'Toyota'
     ];
+
+    const types = [ // placeholder until db is populated
+        'SUV',
+        'Sedan',
+        'Coupe',
+        'Hybrid',
+        'Electric',
+        'Hatchback',
+        'Luxury',
+        'Sports',
+        'Convertible',
+    ];
+
+    const [typeName, setTypeName] = React.useState([]);
+
+    const handleTypeSel = (event) => {
+        const {
+            target: { value },
+        } = event;
+        setTypeName(
+            typeof value === 'string' ? value.split(',') : value,
+        );
+    };
+
+
+
+    const [value, setValue] = React.useState([2, 7]);
+
+    const handleSliderChange = (event, newValue) => {
+        setValue(newValue);
+    };
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -164,6 +203,7 @@ export default function SignIn() {
                     </AccordionSummary>
                     <AccordionDetails>
                             {/*Following filters can also be reused for search results page*/}
+                            <Stack spacing={1.5}>
                             <InputLabel id="sortByLabel">Sort by</InputLabel>
                             <Select
                                 labelId="sortByLabel"
@@ -175,8 +215,8 @@ export default function SignIn() {
                                 onChange={handleSortChange}
                             >
                                 <MenuItem value={"Name"}>Name</MenuItem>
-                                <MenuItem value={"Price (asc)"}>Price (asc)</MenuItem>
-                                <MenuItem value={"Price (dsc)"}>Price (dsc)</MenuItem>
+                                <MenuItem value={"Price per day(asc)"}>Price Per Day (asc)</MenuItem>
+                                <MenuItem value={"Price per day(dsc)"}>Price Per Day (dsc)</MenuItem>
                                 <MenuItem value={"Highest rated"}>Highest Rated</MenuItem>
                                 <MenuItem value={"Cargo capacity"}>Cargo Capacity</MenuItem>
                             </Select>
@@ -191,7 +231,7 @@ export default function SignIn() {
                                 value={manufacturerName}
                                 onChange={handleManufacturerSel}
                                 input={<OutlinedInput id="select-multiple-chip" label="Brand(s)" />}
-                                renderValue={(selected) => (
+                                renderValue={(selected) => ( // Add logic for placeholder if selection is empty
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                         {selected.map((value) => (
                                             <Chip key={value} label={value} />
@@ -200,6 +240,9 @@ export default function SignIn() {
                                 )}
                                 MenuProps={MenuProps}
                             >
+                                <MenuItem disabled value="">
+                                    <em>All</em>
+                                </MenuItem>
                                 {manufacturers.map((name) => (
                                     <MenuItem
                                         key={name}
@@ -208,6 +251,23 @@ export default function SignIn() {
                                         {name}
                                     </MenuItem>
                                 ))}
+                            </Select>
+
+                            <InputLabel id="selPowertrainLabel">Powertrain</InputLabel>
+                            <Select
+                                labelId="selPowertrainLabel"
+                                id="demoPowertrain"
+                                margin="normal"
+                                fullWidth
+                                value={powertrainOptions}
+                                label="powertrainOptions"
+                                onChange={handlePowertrainChange}
+                            >
+                                <MenuItem value={"Any"}>Any</MenuItem>
+                                <MenuItem value={"Hybrid"}>Hybrid</MenuItem>
+                                <MenuItem value={"Electric"}>Electric</MenuItem>
+                                <MenuItem value={"Petrol"}>Petrol</MenuItem>
+                                <MenuItem value={"Diesel"}>Diesel</MenuItem>
                             </Select>
 
                             <InputLabel id="selTransmissionLabel">Transmission</InputLabel>
@@ -224,6 +284,49 @@ export default function SignIn() {
                                 <MenuItem value={"Manual"}>Manual</MenuItem>
                                 <MenuItem value={"Automatic"}>Automatic</MenuItem>
                             </Select>
+
+                            <InputLabel id="selSeats">Seats</InputLabel>
+                            <Slider
+                                getAriaLabel={() => 'Seating capacity'}
+                                value={value}
+                                min={2}
+                                max={7}
+                                onChange={handleSliderChange}
+                                valueLabelDisplay="auto"
+                            />
+
+                                <InputLabel id="typeChipSelLabel">Type(s)</InputLabel>
+                            <Select
+                                labelId="typeChipSelLabel"
+                                id="typeChipSel"
+                                margin="normal"
+                                fullWidth
+                                multiple
+                                value={typeName}
+                                onChange={handleTypeSel}
+                                input={<OutlinedInput id="select-multiple-chip-type" label="Type(s)" />}
+                                renderValue={(selected) => ( // Add logic for placeholder if selection is empty
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                        {selected.map((value) => (
+                                            <Chip key={value} label={value} />
+                                        ))}
+                                    </Box>
+                                )}
+                                MenuProps={MenuProps}
+                            >
+                                <MenuItem disabled value="">
+                                    <em>All</em>
+                                </MenuItem>
+                                {types.map((name) => (
+                                    <MenuItem
+                                        key={name}
+                                        value={name}
+                                    >
+                                        {name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                            </Stack>
                     </AccordionDetails>
                 </Accordion>
 

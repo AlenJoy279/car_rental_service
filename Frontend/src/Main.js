@@ -20,6 +20,7 @@ import Footer from "./Footer";
 import MyAccount from "./MyAccount";
 import About from "./About";
 import ResetPassword from "./ResetPassword";
+import ManageBookings from "./ManageBookings";
 
 
 const defaultTheme = createTheme();
@@ -60,6 +61,7 @@ class Main extends Component {
                                 <Route path="/signup" element={<SignUp/>}/>
                                 <Route path="/login" element={<LogIn/>}/>
                                 <Route path="/myaccount" element={<MyAccount/>}/>
+                                <Route path="/managebookings" element={<ManageBookings/>}/>
                                 <Route path="/about" element={<About/>}/>
                                 <Route path="/resetpassword" element={<ResetPassword/>}/>
                             </Routes>

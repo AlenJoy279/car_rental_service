@@ -66,6 +66,10 @@ export default function ButtonAppBar() {
                                     My Account
                                 </MenuItem>
 
+                                <MenuItem component={Link} to="/managebookings" onClick={handleClose}>
+                                    Manage Bookings
+                                </MenuItem>
+
                                 <MenuItem component={Link} to="/search" onClick={handleClose}>
                                     Search
                                 </MenuItem>
