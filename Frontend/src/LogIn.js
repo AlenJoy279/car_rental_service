@@ -14,12 +14,11 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link } from "react-router-dom";
 
 
-
 const defaultTheme = createTheme();
 
 
 
-export default function SignIn() {
+export default function LogIn() {
     const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -51,7 +50,8 @@ return (
                         Log in
                     </Typography>
                     
-                        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                        <Box component="form" noValidate sx={{ mt: 1 }}>
+                        {/* <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}> */}
 
                             <TextField
                                 margin="normal"
@@ -60,6 +60,7 @@ return (
                                 id="email"
                                 label="Email Address"
                                 name="email"
+                                type="text"
                                 autoComplete="email"
                                 autoFocus
                             />

@@ -9,17 +9,21 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import CssBaseline from '@mui/material/CssBaseline';
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Container } from '@mui/material';
+import { useAuth0 } from '@auth0/auth0-react';
 
 
 
-export default function ButtonAppBar() {
+export default function SharedAppBar() {
 
     const [anchorEl, setAnchorEl] = React.useState(null); 
+    const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
+
     const handleMenu = (event) => {
       setAnchorEl(event.currentTarget);
     };
+    
     const handleClose = () => {
       setAnchorEl(null);
     };
@@ -46,45 +50,99 @@ export default function ButtonAppBar() {
                                 id="menu-appbar"
                                 anchorEl={anchorEl}
                                 anchorOrigin={{
-                                vertical: 'top',
-                                horizontal: 'left',
+                                    vertical: 'top',
+                                    horizontal: 'left',
                                 }}
                                 keepMounted
                                 transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'left',
+                                    vertical: 'top',
+                                    horizontal: 'left',
                                 }}
                                 open={Boolean(anchorEl)}
                                 onClose={handleClose}
                             >
-                            
+                                {/*
+                                Public areas
+                                */}
+
                                 <MenuItem component={Link} to="/about" onClick={handleClose}>
                                     About
                                 </MenuItem>
                                 
-                                <MenuItem component={Link} to="/myaccount" onClick={handleClose}>
-                                    My Account
-                                </MenuItem>
-
                                 <MenuItem component={Link} to="/search" onClick={handleClose}>
                                     Search
                                 </MenuItem>
+                                
+
+                                {/*
+                                Private areas
+                                */}
+
+                                {
+                                    isAuthenticated && (
+                                        <>
+                                            <MenuItem component={Link} to="/myaccount" onClick={handleClose}>
+                                                My Account
+                                            </MenuItem>    
+                                        </>
+                                    )
+                                }
+
                             </Menu>
                         </Box>
                     
-                        <Typography variant="h6" align="center" component="div" sx={{ flexGrow: 1 }}>
+                        <Typography 
+                            variant="h6" 
+                            align="center" 
+                            component="div" 
+                            sx={{ flexGrow: 1 }}>
+                            
                             Rental Car App
+                        
                         </Typography>
                     
-                        <Button component={Link} to="/login" color="inherit">
-                        {/* <Button color="inherit" href={useHref("/login")}> */}
-                            Log in
-                        </Button>
-                                    
-                        <Button component={Link} to="/signup" color="inherit">
-                        {/* <Button color="inherit" href={useHref("/login")}> */}
-                            Sign Up
-                        </Button>
+                        <Box>
+                            {/*
+                            Private vs public areas 
+                            */}
+                            {!isAuthenticated && 
+                                <Button 
+                                    variant = "contained" 
+                                    onClick = {loginWithRedirect} 
+                                    color = "primary"
+                                    disableElevation = "true"
+                                    >                            
+                                    Log in
+                                </Button>
+                            }
+                            {!isAuthenticated && 
+                                <Button 
+                                    variant = "contained" 
+                                    onClick = { () => {
+                                        loginWithRedirect({authorizationParams: {
+                                            screen_hint: "signup",
+                                          }})
+                                    }}
+                                    color = "primary"
+                                    disableElevation = "true"
+                                    >                            
+                                    Sign up
+                                </Button>
+                            }
+
+                            {isAuthenticated && 
+                                <Button 
+                                    variant = "contained" 
+                                    onClick = {() => {
+                                        logout({returnTo: window.location.origin});
+                                    }} 
+                                    color="primary"
+                                    disableElevation = "true"
+                                    >                            
+                                    Log out
+                                </Button>
+                            }
+                        </Box>
                     </Toolbar>
                 </AppBar>
             </CssBaseline>

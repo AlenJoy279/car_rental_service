@@ -3,13 +3,15 @@ import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid"
+import { withAuthenticationRequired } from "@auth0/auth0-react";
+
+import About from "./About";
 
 
 
-const defaultTheme = createTheme();
-
-
-export default function MyAccount(){
+const MyAccount = () => {
+    const defaultTheme = createTheme();
+    
     return (
         <ThemeProvider theme={defaultTheme}>
             <Container>
@@ -22,4 +24,8 @@ export default function MyAccount(){
         </ThemeProvider>
     )
 }
+
+export default withAuthenticationRequired(MyAccount, {
+    onRedirecting: () => <About/>
+})
 
