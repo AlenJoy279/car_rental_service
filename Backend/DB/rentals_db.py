@@ -29,7 +29,7 @@ class rentalsDB():
                 
     def populate_rentals(self):
         with self.conn:
-            self.curs.executemany("INSERT INTO Rentals VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", self.default_rentals)
+            self.curs.executemany("INSERT INTO Rentals VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", self.default_rentals)
       
     def insert_rental(self, rental):
         with self.conn:

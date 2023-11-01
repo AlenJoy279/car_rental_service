@@ -10,9 +10,9 @@ class maintenanceDB():
             (None, 4, '2023-10-29', None, 'Tyre change')
         ]
         
-    def init_db():
+    def init_db(self):
          self.curs.execute("""CREATE TABLE IF NOT EXISTS Maintenance (
-              id integer PRIMARY KEY AUTO INCREMENT,
+              id integer PRIMARY KEY AUTOINCREMENT,
               car_id integer NOT NULL,
               start_date text NOT NULL,
               end_date text,

@@ -39,11 +39,15 @@ class carsDB():
             self.curs.execute("INSERT INTO Cars VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
                     (None, car.make, car.model, car.year, car.type, car.transmission, car.powertrain, car.vin_number,
                         car.seats, car.cargo_capacity, car.status, car.price_per_day, car.range))
+                        
+    def delete_car(self, id):
+        with self.conn:
+            self.curs.execute("DELETE FROM Cars WHERE car_id=?", (id,))
             
     def get_car_by_id(self, id):
         with self.conn:
-            self.curs.execute("SELECT * FROM Cars WHERE id=?", (id,))
-            return self.curs.fetchall()
+            self.curs.execute("SELECT * FROM Cars WHERE car_id=?", (id,))
+            return self.curs.fetchone()
            
     def get_car_by_make(self, make):
         with self.conn:

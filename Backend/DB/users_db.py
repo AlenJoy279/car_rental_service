@@ -14,9 +14,9 @@ class usersDB():
             (None, '5', 'Nina Cantrell', 'ninacantrell@gmail.com', '0877318230')
         ]
         
-    def init_db():
+    def init_db(self):
          self.curs.execute("""CREATE TABLE IF NOT EXISTS Users (
-              user_id integer PRIMARY KEY AUTO INCREMENT,
+              user_id integer PRIMARY KEY AUTOINCREMENT,
               auth_id text NOT NULL,
               email text NOT NULL,
               full_name text NOT NULL,
