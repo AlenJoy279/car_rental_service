@@ -8,7 +8,7 @@ class rentalsDB():
         self.conn.execute('PRAGMA foreign_keys = ON')
         self.curs = self.conn.cursor()
         self.default_rentals = [
-            (None, 1, 2, 'Dublin', '2023-10-20', 1697840966, 'Dublin', '2023-10-29', 1698622166, 810, 'completed', 'paid')
+            (None, 1, 2, 'Dublin', '2023-10-20', 1697840966, 'Dublin', '2023-10-29', 1698622166, 810, 'active', 'paid')
         ]
         self.keys = ('id', 'user_id', 'car_id', 'pick_up', 'start_date', 'start_time', 'drop_off', 'end_date', 'end_time',
             'total_cost', 'status', 'payment_status')
@@ -45,12 +45,20 @@ class rentalsDB():
         with self.conn:
             self.curs.execute("DELETE FROM Rentals WHERE id=?", (id,))
             
+    def update_rental_status(self, id, status):
+        with self.conn:
+            self.curs.execute("UPDATE Rentals SET status=? WHERE id=?", (status, id))
+            
+    def update_rental_payment(self, id, status):
+        with self.conn:
+            self.curs.execute("UPDATE Rentals SET payment_status=? WHERE id=?", (status, id))
+            
     def get_rental_by_id(self, id):
         with self.conn:
             self.curs.execute("SELECT * FROM Rentals WHERE id=?", (id,))
             return fetchall_conversion(self.keys, self.curs.fetchall())
             
-    def show_all_rentals(self):
+    def show_all_active_rentals(self):
         with self.conn:
-            self.curs.execute("SELECT * FROM Rentals")
+            self.curs.execute("SELECT * FROM Rentals WHERE status='active'")
             return fetchall_conversion(self.keys, self.curs.fetchall())

@@ -62,6 +62,10 @@ class carsDB():
             self.curs.execute("SELECT * FROM Cars WHERE model=? AND status='available'", (model,))
             return fetchall_conversion(self.keys, self.curs.fetchall())
             
+    def update_car_status(self, id, status):
+        with self.conn:
+            self.curs.execute("UPDATE Cars SET status=? WHERE car_id=?", (status, id))
+            
     def show_all_available_cars(self):
         with self.conn:
             self.curs.execute("SELECT * FROM Cars WHERE status='available'")
