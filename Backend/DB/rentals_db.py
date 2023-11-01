@@ -1,4 +1,5 @@
 from BO.rental import rental
+from DB.utils import fetchall_conversion
 import sqlite3
 
 class rentalsDB():
@@ -9,6 +10,8 @@ class rentalsDB():
         self.default_rentals = [
             (None, 1, 2, 'Dublin', '2023-10-20', 1697840966, 'Dublin', '2023-10-29', 1698622166, 810, 'completed', 'paid')
         ]
+        self.keys = ('id', 'user_id', 'car_id', 'pick_up', 'start_date', 'start_time', 'drop_off', 'end_date', 'end_time',
+            'total_cost', 'status', 'payment_status')
         
     def init_db(self):
            self.curs.execute("""CREATE TABLE IF NOT EXISTS Rentals (
@@ -37,13 +40,17 @@ class rentalsDB():
                 (None, rental.user_id, rental.car_id, rental.pick_up, rental.start_date, rental.start_time,
                     rental.drop_off, rental.end_date, rental.end_time, rental.total_cost, rental.status,
                         rental.payment_status))
+                        
+    def delete_rental(self, id):
+        with self.conn:
+            self.curs.execute("DELETE FROM Rentals WHERE id=?", (id,))
             
     def get_rental_by_id(self, id):
         with self.conn:
             self.curs.execute("SELECT * FROM Rentals WHERE id=?", (id,))
-            return self.curs.fetchall()
+            return fetchall_conversion(self.keys, self.curs.fetchall())
             
     def show_all_rentals(self):
         with self.conn:
             self.curs.execute("SELECT * FROM Rentals")
-            return self.curs.fetchall()
+            return fetchall_conversion(self.keys, self.curs.fetchall())

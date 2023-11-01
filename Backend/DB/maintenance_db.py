@@ -1,4 +1,5 @@
 from BO.maintenance import maintenance
+from DB.utils import fetchall_conversion
 import sqlite3
 
 class maintenanceDB():
@@ -9,6 +10,7 @@ class maintenanceDB():
         self.default_maintenance = [
             (None, 4, '2023-10-29', None, 'Tyre change')
         ]
+        self.keys = ('id', 'car_id', 'start_date', 'end_date', 'desc')
         
     def init_db(self):
          self.curs.execute("""CREATE TABLE IF NOT EXISTS Maintenance (
@@ -31,4 +33,4 @@ class maintenanceDB():
     def get_maintenance_by_id(self, id):
         with self.conn:
             self.curs.execute("SELECT * FROM Maintenance WHERE id=?", (id,))
-            return self.curs.fetchall()
+            return fetchall_conversion(self.keys, self.curs.fetchall())

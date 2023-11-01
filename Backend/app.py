@@ -45,23 +45,21 @@ def delete_car():
 @app.route('/vehicles/cars/get/id', methods=['GET', 'POST'])
 def get_car_by_id():
     req_data = request.form
-    car_data = carDB.get_car_by_id(req_data['id'])
-    return car_dict(car_data)
+    return carDB.get_car_by_id(req_data['id'])
                         
 @app.route('/vehicles/cars/get/make', methods=['GET', 'POST'])
 def get_car_by_make():
     req_data = request.form
-    car_data = carDB.get_car_by_make(req_data['make'])
-    return car_data
+    return carDB.get_car_by_make(req_data['make'])
+    
+@app.route('/vehicles/cars/get/model', methods=['GET', 'POST'])
+def get_car_by_model():
+    req_data = request.form
+    return carDB.get_car_by_model(req_data['model'])
     
 @app.route('/vehicles/cars/get/all')
-def show_all_cars():
-    return carDB.show_all_cars()
-    
-def car_dict(car_data):
-    return {"id": car_data[0], "make": car_data[1], "model": car_data[2], "year": car_data[3], "type": car_data[4],
-        "transmission": car_data[5], "powertrain": car_data[6], "vin_number": car_data[7], "seats": car_data[8],
-            "cargo_cap": car_data[9], "status": car_data[10], "price_per_day": car_data[11], "range": car_data[12]}
+def show_all_available_cars():
+    return carDB.show_all_available_cars()
     
 if __name__ == '__main__':
     app.run()

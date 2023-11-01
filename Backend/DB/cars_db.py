@@ -1,4 +1,5 @@
 from BO.car import car
+from DB.utils import fetchall_conversion
 import sqlite3
 
 class carsDB():
@@ -13,6 +14,8 @@ class carsDB():
             (None, 'Ford', 'F-150', 2022, 'Van', 'manual', 'petrol', '3489', 3, 80, 'maintenance', 150, None),
             (None, 'BMW', 'M2 Coupe', 2016, 'SUV', 'manual', 'diesel', '2190', 4, 40, 'available', 170, None),
         ]
+        self.keys = ('id', 'make', 'model', 'year', 'type', 'transmission', 'powertrain', 'vin_number',
+            'seats', 'cargo_cap', 'status', 'range')
         
     def init_db(self):
            self.curs.execute("""CREATE TABLE IF NOT EXISTS Cars (
@@ -47,14 +50,19 @@ class carsDB():
     def get_car_by_id(self, id):
         with self.conn:
             self.curs.execute("SELECT * FROM Cars WHERE car_id=?", (id,))
-            return self.curs.fetchone()
+            return fetchall_conversion(self.keys, self.curs.fetchall())
            
     def get_car_by_make(self, make):
         with self.conn:
-            self.curs.execute("SELECT * FROM Cars WHERE make=?", (make,))
-            return self.curs.fetchall()
+            self.curs.execute("SELECT * FROM Cars WHERE make=? AND status='available'", (make,))
+            return fetchall_conversion(self.keys, self.curs.fetchall())
             
-    def show_all_cars(self):
+    def get_car_by_model(self, model):
         with self.conn:
-            self.curs.execute("SELECT * FROM Cars")
-            return self.curs.fetchall()
+            self.curs.execute("SELECT * FROM Cars WHERE model=? AND status='available'", (model,))
+            return fetchall_conversion(self.keys, self.curs.fetchall())
+            
+    def show_all_available_cars(self):
+        with self.conn:
+            self.curs.execute("SELECT * FROM Cars WHERE status='available'")
+            return fetchall_conversion(self.keys, self.curs.fetchall())
