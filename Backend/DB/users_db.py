@@ -37,3 +37,8 @@ class usersDB():
         with self.conn:
             self.curs.execute("SELECT * FROM Users WHERE user_id=?", (id,))
             return fetchall_conversion(self.keys, self.curs.fetchall())
+            
+    def show_all_users(self):
+        with self.conn:
+            self.curs.execute("SELECT * FROM Users")
+            return fetchall_conversion(self.keys, self.curs.fetchall())

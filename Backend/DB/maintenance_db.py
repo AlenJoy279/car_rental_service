@@ -34,3 +34,13 @@ class maintenanceDB():
         with self.conn:
             self.curs.execute("SELECT * FROM Maintenance WHERE id=?", (id,))
             return fetchall_conversion(self.keys, self.curs.fetchall())
+            
+    def get_maintenance_by_car_id(self, id):
+        with self.conn:
+            self.curs.execute("SELECT * FROM Maintenance WHERE car_id=?", (id,))
+            return fetchall_conversion(self.keys, self.curs.fetchall())
+           
+    def show_all_maintenance(self):
+        with self.conn:
+            self.curs.execute("SELECT * FROM Maintenance")
+            return fetchall_conversion(self.keys, self.curs.fetchall())

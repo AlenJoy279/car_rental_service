@@ -104,5 +104,23 @@ def update_rental_payment():
     rentalDB.update_rental_payment(req_data['id'], req_data['payment_status'])
     return {"status": "Rental successfully updated", "id": req_data['id']}
     
+@app.route('/users/get/all', methods=['GET', 'POST'])
+def show_all_users():
+    return userDB.show_all_users()
+    
+@app.route('/user/get/id', methods=['GET', 'POST'])
+def get_user_by_id():
+    req_data = request.form
+    return userDB.get_user_by_id(req_data['id'])
+    
+@app.route('/maintenance/get/car_id', methods=['GET', 'POST'])
+def get_maintenance_by_car_id():
+    req_data = request.form
+    return maintenanceDB.get_maintenance_by_car_id(req_data['car_id'])
+    
+@app.route('/maintenance/get/all', methods=['GET', 'POST'])
+def show_all_maintenance():
+    return maintenanceDB.show_all_maintenance()
+    
 if __name__ == '__main__':
     app.run()
