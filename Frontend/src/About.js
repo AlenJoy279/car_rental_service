@@ -15,7 +15,7 @@ export default function About(){
             <Container>
                 <Grid>
                     <Typography align="center" component="h1" variant="h5">
-                        About.. To be updated..
+                        Rental Car App. Your journey starts here.
                     </Typography>
                 </Grid>
             </Container>

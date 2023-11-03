@@ -9,13 +9,13 @@ import Grid from "@mui/material/Grid"
 const defaultTheme = createTheme();
 
 
-export default function ResetPassword(){
+export default function Home(){
     return (
         <ThemeProvider theme={defaultTheme}>
             <Container>
                 <Grid>
                     <Typography align="center" component="h1" variant="h5">
-                        Reset Password.. To be updated..
+                        Rental Car App. Your journey starts here.
                     </Typography>
                 </Grid>
             </Container>

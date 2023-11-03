@@ -2,35 +2,35 @@ import React, { Component } from "react";
 import Container from '@mui/material/Container';
 import Grid from "@mui/material/Grid";
 import Box from '@mui/material/Box';
-// import { useAuth0 } from '@auth0/auth0-react';
 import {
     Route,
     HashRouter,
     Routes,
+    Navigate
 } from "react-router-dom";
 import { 
     createTheme, 
     ThemeProvider 
 } from '@mui/material/styles';
 
-// import SignUp from "./SignUp";
-// import LogIn from "./LogIn";
 import Search from "./Search";
 import SharedAppBar from "./SharedAppBar";
 import Footer from "./Footer";
 import MyAccount from "./MyAccount";
 import About from "./About";
-// import ResetPassword from "./ResetPassword";
+import Home from "./Home";
+import ManageBookings from "./ManageBookings";
+
 
 
 const defaultTheme = createTheme();
 
 
+
 // TODO: 
 //
 // Event handlers (user input)
-// fluid grids -> breakpoints -> mobile-first
-// footer to the bottom of a page
+// breakpoints -> mobile-first
 
 
 
@@ -40,10 +40,13 @@ class Main extends Component {
       return (
         <ThemeProvider theme={defaultTheme}>
             <Container 
-                component="main" 
-                maxWidth={false} 
-                disableGutters={true} 
-                sx={{alignContent:"space-between"}}
+                sx={{"&.MuiContainer-root": {
+                    display:"flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    height: "100%"
+                  }
+                }}
             >
                 <HashRouter>
                     <Grid sx={12}>
@@ -55,20 +58,24 @@ class Main extends Component {
                         <Box 
                             className="content"
                         >
-                            <Routes ref={(ref) => {debugger}}>
-                                <Route exact path="/search" element={<Search/>}/>
-                                {/* <Route path="/signup" element={<SignUp/>}/>
-                                <Route path="/login" element={<LogIn/>}/> */}
+                            <Routes>
+                                <Route path="/" element={<Navigate to="/home"/>} />
+                                <Route path="/home" element={<Home/>}/>
                                 <Route path="/myaccount" element={<MyAccount/>}/>
+                                <Route path="/search" element={<Search/>}/>
                                 <Route path="/about" element={<About/>}/>
-                                {/* <Route path="/resetpassword" element={<ResetPassword/>}/> */}
+                                <Route path="/managebookings" element={<ManageBookings/>}/>
                             </Routes>
                         </Box>
                     </Grid>
                     </HashRouter>
                 <Grid sx={12}>
                     <Box>
-                        <Footer/>
+                        <Footer
+                            left="0"
+                            bottom="0"
+                            maxWidth="100%"   
+                        />
                     </Box>
                 </Grid>    
             </Container>

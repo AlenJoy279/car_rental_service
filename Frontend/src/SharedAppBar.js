@@ -27,12 +27,11 @@ export default function SharedAppBar() {
     const handleClose = () => {
       setAnchorEl(null);
     };
-  
 
     return (
         <Container sx={{ flexGrow: 1 }}>
             <CssBaseline>
-                <AppBar position="static">
+                <AppBar position="fixed">
                     <Toolbar>
                         <Box>
                             <IconButton
@@ -72,7 +71,6 @@ export default function SharedAppBar() {
                                 <MenuItem component={Link} to="/search" onClick={handleClose}>
                                     Search
                                 </MenuItem>
-                                
 
                                 {/*
                                 Private areas
@@ -87,6 +85,17 @@ export default function SharedAppBar() {
                                         </>
                                     )
                                 }
+
+                                {
+                                    isAuthenticated && (
+                                        <>
+                                            <MenuItem component={Link} to="/managebookings" onClick={handleClose}>
+                                                Manage Bookings
+                                            </MenuItem>    
+                                        </>
+                                    )
+                                }
+
 
                             </Menu>
                         </Box>
