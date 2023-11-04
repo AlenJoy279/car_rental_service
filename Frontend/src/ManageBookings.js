@@ -9,10 +9,20 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Link from '@mui/material/Link';
+import { withAuthenticationRequired } from "@auth0/auth0-react";
+
+
+
+import Home from "./Home";
+
+
 
 const defaultTheme = createTheme();
 
-export default function ManageBookings() {
+
+
+
+const ManageBookings = () => {
     // Dummy bookings data
     const bookings = [
         {
@@ -86,3 +96,7 @@ export default function ManageBookings() {
         </ThemeProvider>
     );
 }
+
+export default withAuthenticationRequired(ManageBookings, {
+    onRedirecting: () => <Home/>
+})
