@@ -27,7 +27,6 @@ const MyAccount = () => {
     // Will have to read the email/auth id in from auth0 and search in the db for them
     const user_id = 1;
     const base_url = 'http://127.0.0.1:5000'
-
     const [formData, setFormData] = useState({
         username: '',
         confirmUsername: '',
@@ -65,7 +64,8 @@ const MyAccount = () => {
         const fetchData = async () => {
           try {
 
-            const response = await axios.get(base_url + `user/get/id`, { params: { id: user_id } });
+            const response = await axios.get(base_url + `/user/get/id`, { params: { id: user_id } });
+
 
             const userData = response.data[0];
 
