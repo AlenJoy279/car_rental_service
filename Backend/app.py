@@ -26,6 +26,10 @@ maintenanceDB = maintenanceDB()
 maintenanceDB.init_db()
 maintenanceDB.populate_maintenance()
 
+@app.after_request
+def add_default_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+    return response
 
 @app.route('/vehicles/cars/add', methods=['GET', 'POST'])
 def insert_car():
