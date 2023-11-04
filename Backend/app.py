@@ -31,6 +31,7 @@ def add_default_headers(response):
     response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
     return response
 
+# curl -d make=Example -d model=Car -d year=2023 -d type=Sedan -d transmission=manual -d powertrain=petrol -d vin_number=2002 -d seats=4 -d cargo_cap=50 -d status=available -d price_per_day=200 -d range=None http://127.0.0.1:5000/vehicles/cars/add
 @app.route('/vehicles/cars/add', methods=['GET', 'POST'])
 def insert_car():
     req_data = request.form
@@ -40,34 +41,39 @@ def insert_car():
     carDB.insert_car(new_car)
     return {"status": "Car successfully inserted",
         "make": req_data['make'], "model": req_data['model'], "year": req_data['year']}
-    
+  
 @app.route('/vehicles/cars/delete', methods=['GET', 'POST'])
 def delete_car():
     req_data = request.form
     carDB.delete_car(req_data['id'])
     return {"status": "Car successfully deleted", "id": req_data['id']}
-    
+
+# curl -d id=4 -d status=available http://127.0.0.1:5000/vehicles/cars/update     
 @app.route('/vehicles/cars/update', methods=['GET', 'POST'])
 def update_car():
     req_data = request.form
     carDB.update_car_status(req_data['id'], req_data['status'])
     return {"status": "Car successfully updated", "id": req_data['id']}
-    
+
+# curl -d id=1 http://127.0.0.1:5000/vehicles/cars/get/id    
 @app.route('/vehicles/cars/get/id', methods=['GET', 'POST'])
 def get_car_by_id():
     req_data = request.form
     return carDB.get_car_by_id(req_data['id'])
-                        
+
+# curl -d make=Volvo http://127.0.0.1:5000/vehicles/cars/get/make                        
 @app.route('/vehicles/cars/get/make', methods=['GET', 'POST'])
 def get_car_by_make():
     req_data = request.form
     return carDB.get_car_by_make(req_data['make'])
-    
+
+# curl -d model=C40 http://127.0.0.1:5000/vehicles/cars/get/model    
 @app.route('/vehicles/cars/get/model', methods=['GET', 'POST'])
 def get_car_by_model():
     req_data = request.form
     return carDB.get_car_by_model(req_data['model'])
     
+# http://127.0.0.1:5000/vehicles/cars/get/all  
 @app.route('/vehicles/cars/get/all')
 def show_all_available_cars():
     return carDB.show_all_available_cars()
