@@ -26,7 +26,7 @@ class usersDB():
               
     def populate_users(self):
         with self.conn:
-            self.curs.executemany("INSERT INTO Users VALUES (?, ?, ?, ?, ?)", self.default_users)
+            self.curs.executemany("INSERT INTO Users (user_id, auth_id, full_name, email, phone) VALUES(?, ?, ?, ?, ?)", self.default_users)
             
     def insert_user(self, user):
         with self.conn:

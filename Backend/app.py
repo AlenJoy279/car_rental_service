@@ -133,4 +133,4 @@ def show_all_maintenance():
     return maintenanceDB.show_all_maintenance()
     
 if __name__ == '__main__':
-    app.run()
+    app.run(port=9000)
