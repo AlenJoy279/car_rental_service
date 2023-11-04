@@ -7,8 +7,10 @@ from DB.maintenance_db import maintenanceDB
 from DB.rentals_db import rentalsDB
 from DB.users_db import usersDB
 from flask import Flask, request
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 carDB = carsDB()
 carDB.init_db()
@@ -108,10 +110,10 @@ def update_rental_payment():
 def show_all_users():
     return userDB.show_all_users()
     
-@app.route('/user/get/id', methods=['GET', 'POST'])
+@app.route('/user/get/id', methods=['GET'])
 def get_user_by_id():
-    req_data = request.form
-    return userDB.get_user_by_id(req_data['id'])
+    user_id = request.args.get('id')
+    return userDB.get_user_by_id(user_id)
     
 @app.route('/maintenance/get/car_id', methods=['GET', 'POST'])
 def get_maintenance_by_car_id():

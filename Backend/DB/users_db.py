@@ -20,8 +20,8 @@ class usersDB():
          self.curs.execute("""CREATE TABLE IF NOT EXISTS Users (
               user_id integer PRIMARY KEY AUTOINCREMENT,
               auth_id text NOT NULL,
-              email text NOT NULL,
               full_name text NOT NULL,
+              email text NOT NULL,
               phone text)""")
               
     def populate_users(self):
