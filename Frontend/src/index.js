@@ -3,6 +3,12 @@ import ReactDOM from "react-dom";
 import Main from "./Main";
 import { Auth0Provider } from '@auth0/auth0-react';
 
+
+import { getAllAvailableCars, getUserByID } from "./API.js"
+
+getAllAvailableCars().then(console.log);
+getUserByID("1").then(console.log);
+
 ReactDOM.render(
   <Auth0Provider
         domain="dev-stvaur6bjdl0g8p5.eu.auth0.com"
@@ -15,4 +21,4 @@ ReactDOM.render(
       <Main/>
     </Auth0Provider>,
   document.getElementById("root")
-);
+); 

@@ -42,9 +42,10 @@ const menuItemMediaStyle = {
 export default function SharedAppBar() {
 
     const [anchorEl, setAnchorEl] = React.useState(null); 
-    const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
+    const { isAuthenticated, user, loginWithRedirect, logout } = useAuth0();
 
-    console.log("authenticated?", isAuthenticated); 
+    console.log("authenticated?", isAuthenticated);
+    console.log("user", user) 
     
     const handleMenu = (event) => {
       setAnchorEl(event.currentTarget);
