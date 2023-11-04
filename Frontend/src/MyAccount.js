@@ -8,10 +8,10 @@ import Container from "@mui/material/Container";
 import Alert from "@mui/material/Alert";
 import { Link } from 'react-router-dom';
 import { withAuthenticationRequired } from "@auth0/auth0-react";
-
+// Styling reference: MUI documentation
 
 import Home from "./Home";
-
+import PasswordCriteria from "./PasswordCriteria"
 
 
 const defaultTheme = createTheme();
@@ -20,13 +20,13 @@ const defaultTheme = createTheme();
 
 const MyAccount = () => {
     const [formData, setFormData] = useState({
-        email: '',
-        confirmEmail: '',
+        username: '',
+        confirmUsername: '',
         password: '',
         confirmPassword: '',
       });
       const [errors, setErrors] = useState({
-        email: '',
+        username: '',
         password: '',
       });
     
@@ -40,8 +40,8 @@ const MyAccount = () => {
         e.preventDefault();
         let validationErrors = {};
     
-        if (formData.email !== formData.confirmEmail) {
-          validationErrors.email = 'Emails do not match';
+        if (formData.username !== formData.confirmUsername) {
+          validationErrors.username = 'Usernames do not match';
         }
         if (formData.password !== formData.confirmPassword) {
           validationErrors.password = 'Passwords do not match';
@@ -72,22 +72,22 @@ const MyAccount = () => {
           </Typography>
           <TextField
             fullWidth
-            label="Change Email"
-            name="email"
-            value={formData.email}
+            label="Change Username"
+            name="username"
+            value={formData.username}
             onChange={handleChange}
             margin="normal"
           />
-          {formData.email && (
+          {formData.username && (
             <TextField
               required
               fullWidth
-              label="Confirm Email"
-              name="confirmEmail"
-              value={formData.confirmEmail}
+              label="Confirm Username"
+              name="confirmUsername"
+              value={formData.confirmUsername}
               onChange={handleChange}
-              error={Boolean(errors.email)}
-              helperText={errors.email}
+              error={Boolean(errors.username)}
+              helperText={errors.username}
               margin="normal"
             />
           )}
@@ -99,7 +99,10 @@ const MyAccount = () => {
             value={formData.password}
             onChange={handleChange}
             margin="normal"
+            error={Boolean(errors.password)}
+            helperText={errors.password}
           />
+          {formData.password && <PasswordCriteria password={formData.password} />}
           {formData.password && (
             <TextField
               required
