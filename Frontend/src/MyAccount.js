@@ -5,15 +5,12 @@ import Box from '@mui/material/Box';
 import TextField from "@mui/material/TextField";
 import Button from '@mui/material/Button';
 import Container from "@mui/material/Container";
-import Alert from "@mui/material/Alert";
 import { Link } from 'react-router-dom';
 import { withAuthenticationRequired } from "@auth0/auth0-react";
-import { validatePassword } from './PasswordCriteria';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import axios from 'axios';
 
 import Home from "./Home";
-import PasswordCriteria from "./PasswordCriteria"
 
 const defaultTheme = createTheme();
 
@@ -25,21 +22,15 @@ const MyAccount = () => {
 
     // Only a placeholder for now to reflect one logged-in user
     // Will have to read the email/auth id in from auth0 and search in the db for them
-    const user_id = 1;
+    const user_id = 2;
     const base_url = 'http://127.0.0.1:5000'
     const [formData, setFormData] = useState({
-        username: '',
-        confirmUsername: '',
-        password: '',
-        confirmPassword: '',
         firstName: '',
         lastName: '',
-        email: '', // Assuming this is fetched and set from the backend
+        email: '',
         phoneNumber: '',
       });
       const [errors, setErrors] = useState({
-        username: '',
-        password: '',
         firstName: '',
         lastName: '',
         phoneNumber: '',
@@ -48,10 +39,6 @@ const MyAccount = () => {
       // Function to clear the form
     const clearForm = () => {
       setFormData({
-        username: '',
-        confirmUsername: '',
-        password: '',
-        confirmPassword: '',
         firstName: '',
         lastName: '',
         email: '',
@@ -87,47 +74,41 @@ const MyAccount = () => {
         };
 
     fetchData();
-  }, [user_id]);
+  }, []);
 
-
-
-
-      // Add a new state for password validity
-    const [isPasswordValid, setIsPasswordValid] = useState(true);
       const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-        setErrors({ ...errors, [name]: '' });
-
-          if (name === 'password') {
-        const isValid = validatePassword(value);
-        setIsPasswordValid(isValid);
-          }
-
+      const { name, value } = e.target;
+      setFormData({ ...formData, [name]: value });
+      setErrors({ ...errors, [name]: '' });
       };
-    
-      const handleSubmit = (e) => {
+
+      const handleSubmit = async (e) => {
         e.preventDefault();
         let validationErrors = {};
-    
-        if (formData.username !== formData.confirmUsername) {
-          validationErrors.username = 'Usernames do not match';
-        }
-        if (formData.password !== formData.confirmPassword) {
-          validationErrors.password = 'Passwords do not match';
-        }
-        if (!isPasswordValid) {
-          validationErrors.password = 'Password does not meet the required criteria';
-        }
+
         if (Object.keys(validationErrors).length > 0) {
           setErrors(validationErrors);
-        } else {
-          console.log('Form data submitted:', formData);
-          // Logic for form data submission
+       } else {
+        // Combine first name and last name into full name as in the db
+        const fullName = `${formData.firstName.trim()} ${formData.lastName.trim()}`;
+
+        try {
+          const response = await axios.put(`${base_url}/user/update/${user_id}`, {
+            full_name: fullName, // Using the correct database column names
+            email: formData.email,
+            phone: formData.phoneNumber,
+          }, {
+            params: { id: user_id } // Send user_id as a query parameter
+          });
+
+          // On success
+          console.log('User data updated:', response.data);
+        } catch (error) {
+          console.error("Error updating user data:", error);
+          // Handle errors - tbd
         }
-
-
-      };
+      }
+    };
     
       return (
         <ThemeProvider theme={defaultTheme}>
@@ -143,64 +124,11 @@ const MyAccount = () => {
         <AccountCircleIcon sx={{ fontSize: 40, mt: 2 }} />
         <form onSubmit={handleSubmit}>
           <Typography component="h2" variant="h6" align="center">
-                Account Settings
-          </Typography>
-          <TextField
-            fullWidth
-            label="Change Username"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            margin="normal"
-          />
-          {formData.username && (
-            <TextField
-              required
-              fullWidth
-              label="Confirm Username"
-              name="confirmUsername"
-              value={formData.confirmUsername}
-              onChange={handleChange}
-              error={Boolean(errors.username)}
-              helperText={errors.username}
-              margin="normal"
-            />
-          )}
-          <TextField
-            fullWidth
-            label="Change Password"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            margin="normal"
-            error={Boolean(errors.password)}
-            helperText={errors.password}
-          />
-          {formData.password && <PasswordCriteria password={formData.password} />}
-          {formData.password && (
-            <TextField
-              required
-              fullWidth
-              label="Confirm Password"
-              name="confirmPassword"
-              type="password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              error={Boolean(errors.password)}
-              helperText={errors.password}
-              margin="normal"
-            />
-          )}
-          {Object.values(errors).some(Boolean) && (
-            <Alert severity="error">Please fix the errors above</Alert>
-          )}
-
-          <Typography component="h2" variant="h6" align="center">
             Personal Details
           </Typography>
           <TextField
             fullWidth
+            required
             label="First Name"
             name="firstName"
             value={formData.firstName}
@@ -211,6 +139,7 @@ const MyAccount = () => {
           />
           <TextField
             fullWidth
+            required
             label="Last Name"
             name="lastName"
             value={formData.lastName}
@@ -229,10 +158,10 @@ const MyAccount = () => {
               readOnly: true,
             }}
             margin="normal"
-            // No error or helperText as it's display only
           />
           <TextField
             fullWidth
+            required
             label="Phone Number"
             name="phoneNumber"
             value={formData.phoneNumber}
