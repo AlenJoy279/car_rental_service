@@ -8,15 +8,14 @@ import Container from "@mui/material/Container";
 import Alert from "@mui/material/Alert";
 import { Link } from 'react-router-dom';
 import { withAuthenticationRequired } from "@auth0/auth0-react";
-// Styling reference: MUI documentation
+import { validatePassword } from './PasswordCriteria';
 
 import Home from "./Home";
 import PasswordCriteria from "./PasswordCriteria"
 
-
 const defaultTheme = createTheme();
 
-
+// Styling and code reference: MUI documentation
 
 const MyAccount = () => {
     const [formData, setFormData] = useState({
@@ -29,11 +28,20 @@ const MyAccount = () => {
         username: '',
         password: '',
       });
+
+      // Add a new state for password validity
+    const [isPasswordValid, setIsPasswordValid] = useState(true);
     
       const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
         setErrors({ ...errors, [name]: '' });
+
+          if (name === 'password') {
+        const isValid = validatePassword(value);
+        setIsPasswordValid(isValid);
+          }
+
       };
     
       const handleSubmit = (e) => {
@@ -46,13 +54,17 @@ const MyAccount = () => {
         if (formData.password !== formData.confirmPassword) {
           validationErrors.password = 'Passwords do not match';
         }
-    
+        if (!isPasswordValid) {
+          validationErrors.password = 'Password does not meet the required criteria';
+        }
         if (Object.keys(validationErrors).length > 0) {
           setErrors(validationErrors);
         } else {
           console.log('Form data submitted:', formData);
           // Logic for form data submission
         }
+
+
       };
     
       return (

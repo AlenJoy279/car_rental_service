@@ -10,6 +10,21 @@ import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 import {ListItemText} from "@mui/material";
 
+// Utility function to check password criteria
+export const validatePassword = (password) => {
+  const criteria = {
+    minLength: password.length >= 10,
+    lowercase: /[a-z]/.test(password),
+    uppercase: /[A-Z]/.test(password),
+    numbers: /[0-9]/.test(password),
+    specialChars: /[!@#$%^&*]/.test(password),
+  };
+
+  // At least 10 characters and 3 of the other 4 criteria
+  const passedCriteria = Object.values(criteria).filter(Boolean).length;
+  return criteria.minLength && passedCriteria >= 4;
+};
+
 function PasswordCriteria({ password }) {
   const criteria = {
     minLength: password.length >= 10,
@@ -26,8 +41,6 @@ function PasswordCriteria({ password }) {
     numbers: 'At least one number (0-9)',
     specialChars: 'At least one special character (!@#$%^&*)',
   };
-
-  const criteriaCount = Object.values(criteria).filter(Boolean).length;
 
   return (
     <Card variant="outlined" sx={{ mt: 2 }}>
