@@ -19,7 +19,7 @@ class maintenanceDB():
               start_date text NOT NULL,
               end_date text,
               desc text NOT NULL,
-              FOREIGN KEY(car_id) REFERENCES Cars(car_id))""")
+              FOREIGN KEY(car_id) REFERENCES Cars(car_id) ON DELETE CASCADE)""")
               
     def populate_maintenance(self):
         with self.conn:
