@@ -29,6 +29,9 @@ maintenanceDB.populate_maintenance()
 @app.after_request
 def add_default_headers(response):
     response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+    response.headers.add('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
 
 # curl -d make=Example -d model=Car -d year=2023 -d type=Sedan -d transmission=manual -d powertrain=petrol -d vin_number=2002 -d seats=4 -d cargo_cap=50 -d status=available -d price_per_day=200 -d range=None http://127.0.0.1:5000/vehicles/cars/add

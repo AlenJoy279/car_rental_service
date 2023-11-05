@@ -24,7 +24,7 @@ const MyAccount = () => {
     // Only a placeholder for now to reflect one logged-in user
     // Will have to read the email/auth id in from auth0 and search in the db for them
     const user_id = 2;
-    const base_url = 'http://127.0.0.1:5000'
+    const base_url = 'http://127.0.0.1:9000'
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -62,9 +62,9 @@ const MyAccount = () => {
             // Update state with the fetched data
             setFormData(prevFormData => ({
               ...prevFormData,
-                firstName: userData.email_text ? userData.email_text.split(' ')[0] : '',
-                lastName: userData.email_text && userData.email_text.split(' ').length > 1 ? userData.email_text.split(' ')[1] : '',
-                email: userData.full_name || '',
+                firstName: userData.full_name ? userData.full_name.split(' ')[0] : '',
+                lastName: userData.full_name && userData.full_name.split(' ').length > 1 ? userData.full_name.split(' ')[1] : '',
+                email: userData.email_text || '',
                 phoneNumber: userData.phone || '',
 
             }));
