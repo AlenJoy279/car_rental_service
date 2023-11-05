@@ -10,7 +10,7 @@ from flask import Flask, request
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, allow_headers = "*")
 
 carDB = carsDB()
 carDB.init_db()
@@ -28,10 +28,12 @@ maintenanceDB = maintenanceDB()
 maintenanceDB.init_db()
 maintenanceDB.populate_maintenance()
 
-@app.after_request
-def add_default_headers(response):
-    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
-    return response
+
+# @app.after_request
+# def add_default_headers(response):
+#     response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+#     return response
+
 
 # curl -d make=Example -d model=Car -d year=2023 -d type=Sedan -d transmission=manual -d powertrain=petrol -d vin_number=2002 -d seats=4 -d cargo_cap=50 -d status=available -d price_per_day=200 -d range=None http://127.0.0.1:5000/vehicles/cars/add
 @app.route('/vehicles/cars/add', methods=['GET', 'POST'])
@@ -133,6 +135,14 @@ def show_all_users():
 def get_user_by_id():
     user_id = request.args.get('id')
     return userDB.get_user_by_id(user_id)
+
+
+# get my user
+@app.route('/user/get_my_user', methods=['GET'])
+def get_my_user():
+    # user_id = request.args.get('id')
+    return userDB.get_user_by_id("1")
+
 
 
 @app.route('/user/update/<int:user_id>', methods=['PUT'])

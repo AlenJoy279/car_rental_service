@@ -14,7 +14,7 @@ class usersDB():
             (None, '4', 'Elena Armstrong', 'elenaarmstrongh@gmail.com', '0863819304'),
             (None, '5', 'Nina Cantrell', 'ninacantrell@gmail.com', '0877318230')
         ]
-        self.keys = ('id', 'auth_id', 'email_text', 'full_name', 'phone')
+        self.keys = ('id', 'auth_id', 'full_name', 'email_text', 'phone')
         
     def init_db(self):
          self.curs.execute("""CREATE TABLE IF NOT EXISTS Users (
@@ -30,7 +30,7 @@ class usersDB():
             
     def insert_user(self, user):
         with self.conn:
-            self.curs.execute("INSERT INTO Users VALUES (?, ?, ?, ?, ?)", 
+            self.curs.execute("INSERT INTO Users (user_id, auth_id, email, full_name, phone) VALUES (?, ?, ?, ?, ?)", 
                     (None, user.auth_id, user.email, user.full_name, user.phone))
                     
     def get_user_by_id(self, id):
