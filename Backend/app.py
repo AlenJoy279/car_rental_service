@@ -43,7 +43,6 @@ def insert_car():
                   req_data['cargo_cap'], req_data['status'], req_data['price_per_day'], req_data['range'])
     carDB.insert_car(new_car)
     return {"status": "Car successfully inserted",
-<<<<<<<<< Temporary merge branch 1
         "make": req_data['make'], "model": req_data['model'], "year": req_data['year']}
 
 @app.route('/vehicles/cars/delete', methods=['GET', 'POST'])
