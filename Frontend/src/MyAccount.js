@@ -9,9 +9,12 @@ import { Link } from 'react-router-dom';
 import { withAuthenticationRequired } from "@auth0/auth0-react";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import axios from 'axios';
+import { useAuth0 } from '@auth0/auth0-react';
 
 
 import Home from "./Home";
+import API, { upsertUser, updateUser } from "./API"
+
 
 const defaultTheme = createTheme();
 
@@ -23,51 +26,58 @@ const MyAccount = () => {
 
     // Only a placeholder for now to reflect one logged-in user
     // Will have to read the email/auth id in from auth0 and search in the db for them
-    const user_id = 2;
-    const base_url = 'http://127.0.0.1:5000'
+    const [userState, setUserState] = useState(
+      {
+        user_id: 0,
+        token: "",  
+      }
+
+    ) 
+
     const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
+        fullName: '',
         email: '',
         phoneNumber: '',
       });
       const [errors, setErrors] = useState({
-        firstName: '',
-        lastName: '',
+        fullName: '',
         phoneNumber: '',
       });
 
       // Function to clear the form
     const clearForm = () => {
       setFormData({
-        firstName: '',
-        lastName: '',
+        fullName: '',
         email: '',
         phoneNumber: '',
       });
     };
 
+    const { getAccessTokenSilently, user } = useAuth0();
 
-      useEffect(() => {
-        const fetchData = async () => {
+    useEffect(() => {
+      const fetchData = async () => {
           try {
 
-            const response = await axios.get(base_url + `/user/get/id`, { params: { id: user_id } });
-
-
-            const userData = response.data[0];
-
-            console.log(userData)
+            let token = await getAccessTokenSilently()
+            
+            const response = await upsertUser(token, user.email);
+            const userData = response[0]
+            
+            console.log("userData", userData)
+           
+            // set user state
+            setUserState({user_id: userData.id, token: token});
 
             // Update state with the fetched data
             setFormData(prevFormData => ({
               ...prevFormData,
-                firstName: userData.email_text ? userData.email_text.split(' ')[0] : '',
-                lastName: userData.email_text && userData.email_text.split(' ').length > 1 ? userData.email_text.split(' ')[1] : '',
-                email: userData.full_name || '',
+                fullName: userData.full_name || "",
+                email: userData.email_text || '',
                 phoneNumber: userData.phone || '',
 
             }));
+
           } catch (error) {
             console.error("Error fetching user data:", error);
             // Handle errors
@@ -75,42 +85,37 @@ const MyAccount = () => {
         };
 
     fetchData();
-  }, []);
+    }, []);
 
-      const handleChange = (e) => {
+    
+    const handleChange = (e) => {
       const { name, value } = e.target;
       setFormData({ ...formData, [name]: value });
       setErrors({ ...errors, [name]: '' });
-      };
+    };
 
-      const handleSubmit = async (e) => {
-        e.preventDefault();
-        let validationErrors = {};
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      let validationErrors = {};
 
-        if (Object.keys(validationErrors).length > 0) {
-          setErrors(validationErrors);
-       } else {
-        // Combine first name and last name into full name as in the db
-        const fullName = `${formData.firstName.trim()} ${formData.lastName.trim()}`;
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+      } else {
 
         try {
-          const response = await axios.put(`${base_url}/user/update/${user_id}`, {
-            full_name: fullName, // Using the correct database column names
-            email: formData.email,
-            phone: formData.phoneNumber,
-          }, {
-            params: { id: user_id } // Send user_id as a query parameter
-          });
+          const response = await updateUser(userState.token, userState.user_id, {full_name: formData.fullName, phone: formData.phoneNumber});
 
           // On success
           console.log('User data updated:', response.data);
         } catch (error) {
-          console.error("Error updating user data:", error);
-          // Handle errors - tbd
+            console.error("Error updating user data:", error);
+            // Handle errors - tbd
         }
       }
     };
     
+    debugger;
+
       return (
         <ThemeProvider theme={defaultTheme}>
         <Container component="main" maxWidth="xs">
@@ -130,24 +135,13 @@ const MyAccount = () => {
           <TextField
             fullWidth
             required
-            label="First Name"
-            name="firstName"
-            value={formData.firstName}
+            label="Full Name"
+            name="fullName"
+            value={formData.fullName}
             onChange={handleChange}
             margin="normal"
-            error={Boolean(errors.firstName)}
-            helperText={errors.firstName}
-          />
-          <TextField
-            fullWidth
-            required
-            label="Last Name"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            margin="normal"
-            error={Boolean(errors.lastName)}
-            helperText={errors.lastName}
+            error={Boolean(errors.fullName)}
+            helperText={errors.fullName}
           />
           <TextField
             fullWidth

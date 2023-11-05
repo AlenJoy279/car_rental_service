@@ -9,20 +9,32 @@ from DB.users_db import usersDB
 from flask import Flask, request
 from flask_cors import CORS
 
+# token validation
+import jwt
+import sys
+
 app = Flask(__name__)
 CORS(app, allow_headers = "*")
 
 carDB = carsDB()
 carDB.init_db()
-carDB.populate_cars()
 
 userDB = usersDB()
 userDB.init_db()
-userDB.populate_users()
 
 rentalDB = rentalsDB()
 rentalDB.init_db()
-rentalDB.populate_rentals()
+
+
+# if "populate" in command line args - use the dummy data 
+#  from the code to populate the table
+# "populate" needed when db file is deleted and the new one created 
+if "populate" in sys.argv:
+    carDB.populate_cars()
+    userDB.populate_users()
+    rentalDB.populate_rentals()
+
+
 
 maintenanceDB = maintenanceDB()
 maintenanceDB.init_db()
@@ -137,17 +149,43 @@ def get_user_by_id():
     return userDB.get_user_by_id(user_id)
 
 
-# get my user
-@app.route('/user/get_my_user', methods=['GET'])
-def get_my_user():
+# upsert user
+@app.route('/user/upsert', methods=['POST'])
+def upsert_my_user():
+
+    # secret
+    public_key = "read_from_secret_file"
+    
+    # get user data from token
+    token = request.headers["Authorization"].split(" ")[1]
+
+    # check what format public key must have to make verify signature work
+    payload = jwt.decode(token, public_key, algorithms=["RS256"], options={"verify_signature": False})  # sub - authentication id
+
     # user_id = request.args.get('id')
-    return userDB.get_user_by_id("1")
+    req_data = request.form # user email - unique 
+
+    auth_id = payload["sub"]
+    email = req_data["email"]
+
+    # if not in DB - create, if in DB - update
+    # add error handling based on the error type returned
+    try:
+        user_object = userDB.insert_user(user(auth_id, email, "", ""))
+    
+    except Exception as e:
+        print(e)
+
+    user_object = userDB.get_user_by_email(email)
+
+    return user_object
 
 
-
-@app.route('/user/update/<int:user_id>', methods=['PUT'])
-def update_user(user_id):
-    req_data = request.json
+@app.route('/user/update', methods=['PUT'])
+def update_user():
+    req_data = request.form
+    user_id = req_data["id"]
+    
     try:
         update_status = userDB.update_user_by_id(user_id, req_data)
 

@@ -19,9 +19,9 @@ class usersDB():
     def init_db(self):
          self.curs.execute("""CREATE TABLE IF NOT EXISTS Users (
               user_id integer PRIMARY KEY AUTOINCREMENT,
-              auth_id text NOT NULL,
+              auth_id text NOT NULL UNIQUE,
               full_name text NOT NULL,
-              email text NOT NULL,
+              email text NOT NULL UNIQUE, 
               phone text)""")
               
     def populate_users(self):
@@ -37,7 +37,12 @@ class usersDB():
         with self.conn:
             self.curs.execute("SELECT * FROM Users WHERE user_id=?", (id,))
             return fetchall_conversion(self.keys, self.curs.fetchall())
-            
+             
+    def get_user_by_email(self, email):
+        with self.conn:
+            self.curs.execute("SELECT * FROM Users WHERE email=?", (email,))
+            return fetchall_conversion(self.keys, self.curs.fetchall())
+
     def show_all_users(self):
         with self.conn:
             self.curs.execute("SELECT * FROM Users")
@@ -45,15 +50,9 @@ class usersDB():
 
     def update_user_by_id(self, user_id, data):
 
-        fields = ", ".join([f"{key} = ?" for key in data])
-        values = list(data.values())
-        values.append(user_id)  # The user ID is used in the WHERE clause
-
-        update_sql = f"UPDATE Users SET {fields} WHERE user_id = ?"
-
         with self.conn:
             try:
-                self.curs.execute(update_sql, values)
+                self.curs.execute("UPDATE Users SET full_name = ?, phone = ? WHERE user_id = ?", (data["full_name"], data["phone"], user_id))
                 self.conn.commit()
                 return True
             except sqlite3.Error as e:
