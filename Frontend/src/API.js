@@ -1,13 +1,6 @@
 const baseURL = 'http://127.0.0.1:9000';
 
-
-
-
-export async function getAllAvailableCars() {
-   const response =  await fetch(baseURL + '/vehicles/cars/get/all');
-   return response.json();
-}
-
+// users
 
 export async function getUserByID(id) {
     let params = new URLSearchParams({id: id});
@@ -31,3 +24,11 @@ export async function updateUser(token, id, data) {
     return response.json()
 }
 
+
+// cars 
+
+export async function getAllAvailableCars() {
+    const response =  await fetch(baseURL + '/vehicles/cars/get/all');
+    return response.json();
+ }
+ 

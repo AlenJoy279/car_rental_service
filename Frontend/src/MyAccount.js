@@ -13,7 +13,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 
 import Home from "./Home";
-import API, { upsertUser, updateUser } from "./API"
+import { upsertUser, updateUser } from "./API"
 
 
 const defaultTheme = createTheme();
@@ -39,12 +39,10 @@ const MyAccount = () => {
         email: '',
         phoneNumber: '',
       });
-      const [errors, setErrors] = useState({
-        fullName: '',
-        phoneNumber: '',
-      });
-
-      // Function to clear the form
+    
+      const [errors, setErrors] = useState({});
+    
+    // Function to clear the form
     const clearForm = () => {
       setFormData({
         fullName: '',
@@ -88,23 +86,79 @@ const MyAccount = () => {
     }, []);
 
     
+    // remove trailing symbols and replace multiple whitespaces with one
+    const normalizeValue = (name, value) => {
+      if (name == "fullName" || name == "phoneNumber") {return value.trim().replace(/  +/g, ' ')};
+      return value;
+    };
+
+
     const handleChange = (e) => {
       const { name, value } = e.target;
-      setFormData({ ...formData, [name]: value });
-      setErrors({ ...errors, [name]: '' });
+      setFormData({ ...formData, [name]: value});
+      setErrors({ ...errors, [name]: '' });      
+    };
+
+
+    // validate inputs
+    const checkErrors = () => {
+      let errors = {};
+
+      // if empty field
+      if (formData.fullName.trim() == "") {
+        errors.fullName = "This field cannot be empty. Please enter your full name."
+      };
+
+      // if only one word
+      if (! formData.fullName.trim().match(/\s/)) {
+        errors.fullName = "Please enter your name and surname."
+      };
+
+      // if numbers or special characters are entered
+      if (! formData.fullName.match(/^[a-zA-Z\s]+$/)) {
+        errors.fullName = "Please enter valid name. Numbers and special characters are not allowed."
+      };
+
+      // if empty field
+      if (formData.phoneNumber == "") {
+        errors.phoneNumber = "This field cannot be empty. Please enter your phone."
+      };
+
+      // if letters or special characters entered
+      if (! formData.phoneNumber.match(/^\d+$/)) {
+        errors.phoneNumber = "Please enter phone number in the valid format, i.e., 1234567890. Letters and special characters are not allowed."
+      };
+
+      // if letters or special characters entered
+      if (formData.phoneNumber.length > 10) {
+        errors.phoneNumber = "Please check if phone number is correct. It cannot be more than 10 digits."
+      };
+
+      return errors;
     };
 
     const handleSubmit = async (e) => {
       e.preventDefault();
-      let validationErrors = {};
-
+      let validationErrors = checkErrors();
+      // setErrors(validationErrors);
+      
       if (Object.keys(validationErrors).length > 0) {
         setErrors(validationErrors);
       } else {
 
+        for (let name in formData) {
+          let value = formData[name];
+          formData[name] = normalizeValue(name, value);
+        };
+        console.log(formData);
+        setFormData(formData);
+        
         try {
           const response = await updateUser(
-            userState.token, userState.user_id, {full_name: formData.fullName, phone: formData.phoneNumber});
+            userState.token, 
+            userState.user_id, 
+            {full_name: formData.fullName, phone: formData.phoneNumber}
+          );
 
           // On success
           console.log('User data updated:', response.data);
