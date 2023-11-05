@@ -20,8 +20,8 @@ class usersDB():
          self.curs.execute("""CREATE TABLE IF NOT EXISTS Users (
               user_id integer PRIMARY KEY AUTOINCREMENT,
               auth_id text NOT NULL,
-              email text NOT NULL,
               full_name text NOT NULL,
+              email text NOT NULL,
               phone text)""")
               
     def populate_users(self):
@@ -42,3 +42,23 @@ class usersDB():
         with self.conn:
             self.curs.execute("SELECT * FROM Users")
             return fetchall_conversion(self.keys, self.curs.fetchall())
+
+    def update_user_by_id(self, user_id, data):
+
+        fields = ", ".join([f"{key} = ?" for key in data])
+        values = list(data.values())
+        values.append(user_id)  # The user ID is used in the WHERE clause
+
+        update_sql = f"UPDATE Users SET {fields} WHERE user_id = ?"
+
+        with self.conn:
+            try:
+                self.curs.execute(update_sql, values)
+                self.conn.commit()
+                return True
+            except sqlite3.Error as e:
+                print(f"Database error: {e}")
+                return False
+            except Exception as e:
+                print(f"Exception in _query: {e}")
+                return False
