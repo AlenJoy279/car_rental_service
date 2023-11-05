@@ -27,8 +27,8 @@ class rentalsDB():
                 total_cost integer NOT NULL,
                 status text CHECK(status IN ('active', 'completed', 'cancelled')),
                 payment_status text CHECK(payment_status IN ('unpaid', 'paid')),
-                FOREIGN KEY(car_id) REFERENCES Cars(car_id),
-                FOREIGN KEY(user_id) REFERENCES Users(user_id))""")
+                FOREIGN KEY(car_id) REFERENCES Cars(car_id) ON DELETE CASCADE,
+                FOREIGN KEY(user_id) REFERENCES Users(user_id) ON DELETE CASCADE)""")
                 
     def populate_rentals(self):
         with self.conn:
