@@ -10,6 +10,7 @@ import { withAuthenticationRequired } from "@auth0/auth0-react";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import axios from 'axios';
 
+
 import Home from "./Home";
 
 const defaultTheme = createTheme();

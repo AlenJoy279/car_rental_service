@@ -15,11 +15,38 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 
 
+const extraSmallWidth = "600px";
+
+
+const buttonMediaStyle = {
+    ['@media (min-width: 0px)']: {
+      display: "none",
+    },
+    [`@media (min-width: ${extraSmallWidth})`]: {
+      display: "inline-flex",
+    },
+  };
+
+
+const menuItemMediaStyle = {
+    ['@media (min-width: 0px)']: {
+      display: "block",
+    },
+    [`@media (min-width: ${extraSmallWidth})`]: {
+      display: "none",
+    },
+  };
+
+
+
 export default function SharedAppBar() {
 
     const [anchorEl, setAnchorEl] = React.useState(null); 
-    const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
+    const { isAuthenticated, user, loginWithRedirect, logout } = useAuth0();
 
+    console.log("authenticated?", isAuthenticated);
+    console.log("user", user) 
+    
     const handleMenu = (event) => {
       setAnchorEl(event.currentTarget);
     };
@@ -96,6 +123,53 @@ export default function SharedAppBar() {
                                     )
                                 }
 
+                                {
+                                    !isAuthenticated && (
+                                        <>
+                                            <MenuItem 
+                                            component={Link} 
+                                            sx={menuItemMediaStyle}
+                                            onClick = {loginWithRedirect}
+                                            >
+                                                Log In
+                                            </MenuItem>    
+                                        </>
+                                    )
+                                }
+
+                                {
+                                    !isAuthenticated && (
+                                        <>
+                                            <MenuItem 
+                                            component={Link} 
+                                            sx={menuItemMediaStyle}
+                                            onClick = { () => {
+                                                loginWithRedirect({authorizationParams: {
+                                                 screen_hint: "signup",
+                                                }})
+                                            }}
+                                            >
+                                                Sign Up
+                                            </MenuItem>    
+                                        </>
+                                    )
+                                }
+
+                                {
+                                    isAuthenticated && (
+                                        <>
+                                            <MenuItem 
+                                            component={Link} 
+                                            sx={menuItemMediaStyle}
+                                            onClick = {() => {
+                                                logout({returnTo: window.location.origin});
+                                            }}
+                                            >
+                                                Log Out
+                                            </MenuItem>    
+                                        </>
+                                    )
+                                }
 
                             </Menu>
                         </Box>
@@ -120,6 +194,7 @@ export default function SharedAppBar() {
                                     onClick = {loginWithRedirect} 
                                     color = "primary"
                                     disableElevation = "true"
+                                    sx={buttonMediaStyle}
                                     >                            
                                     Log in
                                 </Button>
@@ -134,6 +209,7 @@ export default function SharedAppBar() {
                                     }}
                                     color = "primary"
                                     disableElevation = "true"
+                                    sx={buttonMediaStyle}
                                     >                            
                                     Sign up
                                 </Button>
@@ -147,6 +223,7 @@ export default function SharedAppBar() {
                                     }} 
                                     color="primary"
                                     disableElevation = "true"
+                                    sx={buttonMediaStyle}
                                     >                            
                                     Log out
                                 </Button>
