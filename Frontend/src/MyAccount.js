@@ -103,7 +103,8 @@ const MyAccount = () => {
       } else {
 
         try {
-          const response = await updateUser(userState.token, userState.user_id, {full_name: formData.fullName, phone: formData.phoneNumber});
+          const response = await updateUser(
+            userState.token, userState.user_id, {full_name: formData.fullName, phone: formData.phoneNumber});
 
           // On success
           console.log('User data updated:', response.data);
@@ -114,8 +115,6 @@ const MyAccount = () => {
       }
     };
     
-    debugger;
-
       return (
         <ThemeProvider theme={defaultTheme}>
         <Container component="main" maxWidth="xs">

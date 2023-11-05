@@ -26,6 +26,10 @@ rentalDB = rentalsDB()
 rentalDB.init_db()
 
 
+
+maintenanceDB = maintenanceDB()
+maintenanceDB.init_db()
+
 # if "populate" in command line args - use the dummy data 
 #  from the code to populate the table
 # "populate" needed when db file is deleted and the new one created 
@@ -33,12 +37,8 @@ if "populate" in sys.argv:
     carDB.populate_cars()
     userDB.populate_users()
     rentalDB.populate_rentals()
+    maintenanceDB.populate_maintenance()
 
-
-
-maintenanceDB = maintenanceDB()
-maintenanceDB.init_db()
-maintenanceDB.populate_maintenance()
 
 
 # @app.after_request
