@@ -15,7 +15,7 @@ class carsDB():
             (None, 'BMW', 'M2 Coupe', 2016, 'SUV', 'manual', 'diesel', '2190', 4, 40, 'available', 170, None),
         ]
         self.keys = ('id', 'make', 'model', 'year', 'type', 'transmission', 'powertrain', 'vin_number',
-            'seats', 'cargo_cap', 'status', 'range')
+            'seats', 'cargo_cap', 'status', 'price_per_day', 'range')
         
     def init_db(self):
            self.curs.execute("""CREATE TABLE IF NOT EXISTS Cars (
