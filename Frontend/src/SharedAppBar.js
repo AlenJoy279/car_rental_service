@@ -42,11 +42,11 @@ const menuItemMediaStyle = {
 export default function SharedAppBar() {
 
     const [anchorEl, setAnchorEl] = React.useState(null); 
-    const { isAuthenticated, user, loginWithRedirect, logout } = useAuth0();
+    const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
 
-    console.log("authenticated?", isAuthenticated);
-    console.log("user", user) 
-    
+    // console.log("authenticated?", isAuthenticated);
+   
+
     const handleMenu = (event) => {
       setAnchorEl(event.currentTarget);
     };
@@ -102,30 +102,30 @@ export default function SharedAppBar() {
                                 {/*
                                 Private areas
                                 */}
-
+                                
                                 {
                                     isAuthenticated && (
-                                        <>
+                                        
                                             <MenuItem component={Link} to="/myaccount" onClick={handleClose}>
                                                 My Account
                                             </MenuItem>    
-                                        </>
+                                        
                                     )
                                 }
-
+                                
                                 {
                                     isAuthenticated && (
-                                        <>
+                                        
                                             <MenuItem component={Link} to="/managebookings" onClick={handleClose}>
                                                 Manage Bookings
                                             </MenuItem>    
-                                        </>
+                                        
                                     )
                                 }
 
                                 {
                                     !isAuthenticated && (
-                                        <>
+                                        
                                             <MenuItem 
                                             component={Link} 
                                             sx={menuItemMediaStyle}
@@ -133,13 +133,13 @@ export default function SharedAppBar() {
                                             >
                                                 Log In
                                             </MenuItem>    
-                                        </>
+                                        
                                     )
                                 }
-
+                                
                                 {
                                     !isAuthenticated && (
-                                        <>
+                                        
                                             <MenuItem 
                                             component={Link} 
                                             sx={menuItemMediaStyle}
@@ -151,13 +151,13 @@ export default function SharedAppBar() {
                                             >
                                                 Sign Up
                                             </MenuItem>    
-                                        </>
+                                        
                                     )
                                 }
-
+                                
                                 {
                                     isAuthenticated && (
-                                        <>
+                                        
                                             <MenuItem 
                                             component={Link} 
                                             sx={menuItemMediaStyle}
@@ -167,7 +167,7 @@ export default function SharedAppBar() {
                                             >
                                                 Log Out
                                             </MenuItem>    
-                                        </>
+                                        
                                     )
                                 }
 

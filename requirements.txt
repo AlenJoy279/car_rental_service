@@ -1,2 +1,5 @@
 db-sqlite3
 flask
+flask_cors
+pyjwt
+pyjwt[crypto]

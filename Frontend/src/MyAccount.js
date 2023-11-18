@@ -9,9 +9,12 @@ import { Link } from 'react-router-dom';
 import { withAuthenticationRequired } from "@auth0/auth0-react";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import axios from 'axios';
+import { useAuth0 } from '@auth0/auth0-react';
 
 
 import Home from "./Home";
+import { upsertUser, updateUser } from "./API"
+
 
 const defaultTheme = createTheme();
 
@@ -23,51 +26,57 @@ const MyAccount = () => {
 
     // Only a placeholder for now to reflect one logged-in user
     // Will have to read the email/auth id in from auth0 and search in the db for them
-    const user_id = 2;
-    const base_url = 'http://127.0.0.1:9000'
+    const [userState, setUserState] = useState(
+      {
+        user_id: 0,
+        token: "",
+      }
+
+    )
+
     const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
+        fullName: '',
         email: '',
         phoneNumber: '',
       });
-      const [errors, setErrors] = useState({
-        firstName: '',
-        lastName: '',
-        phoneNumber: '',
-      });
 
-      // Function to clear the form
+      const [errors, setErrors] = useState({});
+
+    // Function to clear the form
     const clearForm = () => {
       setFormData({
-        firstName: '',
-        lastName: '',
+        fullName: '',
         email: '',
         phoneNumber: '',
       });
     };
 
+    const { getAccessTokenSilently, user } = useAuth0();
 
-      useEffect(() => {
-        const fetchData = async () => {
+    useEffect(() => {
+      const fetchData = async () => {
           try {
 
-            const response = await axios.get(base_url + `/user/get/id`, { params: { id: user_id } });
+            let token = await getAccessTokenSilently()
 
+            const response = await upsertUser(token, user.email);
+            const userData = response[0]
 
-            const userData = response.data[0];
+            console.log("userData", userData)
 
-            console.log(userData)
+            // set user state
+            setUserState({user_id: userData.id, token: token});
 
             // Update state with the fetched data
             setFormData(prevFormData => ({
               ...prevFormData,
-                firstName: userData.full_name ? userData.full_name.split(' ')[0] : '',
-                lastName: userData.full_name && userData.full_name.split(' ').length > 1 ? userData.full_name.split(' ')[1] : '',
-                email: userData.email_text || '',
+                firstName: userData.email_text ? userData.email_text.split(' ')[0] : '',
+                lastName: userData.email_text && userData.email_text.split(' ').length > 1 ? userData.email_text.split(' ')[1] : '',
+                email: userData.full_name || '',
                 phoneNumber: userData.phone || '',
 
             }));
+
           } catch (error) {
             console.error("Error fetching user data:", error);
             // Handle errors
@@ -75,38 +84,88 @@ const MyAccount = () => {
         };
 
     fetchData();
-  }, []);
+    }, []);
 
-      const handleChange = (e) => {
+
+    // remove trailing symbols and replace multiple whitespaces with one
+    const normalizeValue = (name, value) => {
+      if (name == "fullName" || name == "phoneNumber") {return value.trim().replace(/  +/g, ' ')};
+      return value;
+    };
+
+
+    const handleChange = (e) => {
       const { name, value } = e.target;
-      setFormData({ ...formData, [name]: value });
+      setFormData({ ...formData, [name]: value});
       setErrors({ ...errors, [name]: '' });
+    };
+
+
+    // validate inputs
+    const checkErrors = () => {
+      let errors = {};
+
+      // if empty field
+      if (formData.fullName.trim() == "") {
+        errors.fullName = "This field cannot be empty. Please enter your full name."
       };
 
-      const handleSubmit = async (e) => {
-        e.preventDefault();
-        let validationErrors = {};
+      // if only one word
+      if (! formData.fullName.trim().match(/\s/)) {
+        errors.fullName = "Please enter your name and surname."
+      };
 
-        if (Object.keys(validationErrors).length > 0) {
-          setErrors(validationErrors);
-       } else {
-        // Combine first name and last name into full name as in the db
-        const fullName = `${formData.firstName.trim()} ${formData.lastName.trim()}`;
+      // if numbers or special characters are entered
+      if (! formData.fullName.match(/^[a-zA-Z\s]+$/)) {
+        errors.fullName = "Please enter valid name. Numbers and special characters are not allowed."
+      };
+
+      // if empty field
+      if (formData.phoneNumber == "") {
+        errors.phoneNumber = "This field cannot be empty. Please enter your phone."
+      };
+
+      // if letters or special characters entered
+      if (! formData.phoneNumber.match(/^\d+$/)) {
+        errors.phoneNumber = "Please enter phone number in the valid format, i.e., 1234567890. Letters and special characters are not allowed."
+      };
+
+      // if letters or special characters entered
+      if (formData.phoneNumber.length > 10) {
+        errors.phoneNumber = "Please check if phone number is correct. It cannot be more than 10 digits."
+      };
+
+      return errors;
+    };
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      let validationErrors = checkErrors();
+      // setErrors(validationErrors);
+
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+      } else {
+
+        for (let name in formData) {
+          let value = formData[name];
+          formData[name] = normalizeValue(name, value);
+        };
+        console.log(formData);
+        setFormData(formData);
 
         try {
-          const response = await axios.put(`${base_url}/user/update/${user_id}`, {
-            full_name: fullName, // Using the correct database column names
-            email: formData.email,
-            phone: formData.phoneNumber,
-          }, {
-            params: { id: user_id } // Send user_id as a query parameter
-          });
+          const response = await updateUser(
+            userState.token,
+            userState.user_id,
+            {full_name: formData.fullName, phone: formData.phoneNumber}
+          );
 
           // On success
           console.log('User data updated:', response.data);
         } catch (error) {
-          console.error("Error updating user data:", error);
-          // Handle errors - tbd
+            console.error("Error updating user data:", error);
+            // Handle errors - tbd
         }
       }
     };
@@ -130,24 +189,13 @@ const MyAccount = () => {
           <TextField
             fullWidth
             required
-            label="First Name"
-            name="firstName"
-            value={formData.firstName}
+            label="Full Name"
+            name="fullName"
+            value={formData.fullName}
             onChange={handleChange}
             margin="normal"
-            error={Boolean(errors.firstName)}
-            helperText={errors.firstName}
-          />
-          <TextField
-            fullWidth
-            required
-            label="Last Name"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            margin="normal"
-            error={Boolean(errors.lastName)}
-            helperText={errors.lastName}
+            error={Boolean(errors.fullName)}
+            helperText={errors.fullName}
           />
           <TextField
             fullWidth
