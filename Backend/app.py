@@ -6,7 +6,7 @@ from DB.cars_db import carsDB
 from DB.maintenance_db import maintenanceDB
 from DB.rentals_db import rentalsDB
 from DB.users_db import usersDB
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 # token validation
@@ -14,7 +14,7 @@ import jwt
 import sys
 
 app = Flask(__name__)
-CORS(app, allow_headers = "*")
+CORS(app, allow_headers="*")
 
 carDB = carsDB()
 carDB.init_db()
@@ -24,8 +24,6 @@ userDB.init_db()
 
 rentalDB = rentalsDB()
 rentalDB.init_db()
-
-
 
 maintenanceDB = maintenanceDB()
 maintenanceDB.init_db()
@@ -38,7 +36,6 @@ if "populate" in sys.argv:
     userDB.populate_users()
     rentalDB.populate_rentals()
     maintenanceDB.populate_maintenance()
-
 
 
 # @app.after_request
@@ -69,13 +66,15 @@ def insert_car():
                   req_data['cargo_cap'], req_data['status'], req_data['price_per_day'], req_data['range'])
     carDB.insert_car(new_car)
     return {"status": "Car successfully inserted",
-        "make": req_data['make'], "model": req_data['model'], "year": req_data['year']}
-  
+            "make": req_data['make'], "model": req_data['model'], "year": req_data['year']}
+
+
 @app.route('/vehicles/cars/delete', methods=['GET', 'POST'])
 def delete_car():
     req_data = request.form
     carDB.delete_car(req_data['id'])
     return {"status": "Car successfully deleted", "id": req_data['id']}
+
 
 @app.route('/vehicles/cars/update', methods=['GET', 'POST'])
 def update_car():
@@ -83,28 +82,68 @@ def update_car():
     carDB.update_car_status(req_data['id'], req_data['status'])
     return {"status": "Car successfully updated", "id": req_data['id']}
 
+
+@app.route('/api/search')
+def search_cars():
+    # Extract query parameters
+    start_date = request.args.get('startDate')
+    end_date = request.args.get('endDate')
+    pick_up_location = request.args.get('pickUpLocation')
+    drop_off_point = request.args.get('dropOffPoint')
+    # More params
+
+    # Construct query based on parameters
+    query = "SELECT * FROM Cars WHERE status='available'"
+    conditions = []
+
+    if start_date:
+        conditions.append("start_date >= :start_date")
+    if end_date:
+        conditions.append("end_date <= :end_date")
+    # More conditions
+
+    query += " AND ".join(conditions)
+
+
+    try:
+        cursor = carDB.conn.cursor()
+        cursor.execute(query, {
+            'start_date': start_date,
+            'end_date': end_date,
+            # More params
+        })
+        results = cursor.fetchall()
+        return jsonify(results)  # Convert results to JSON and return
+    except Exception as e:
+        return {"status": "Error", "message": str(e)}
+
+
 # curl -d id=1 http://127.0.0.1:5000/vehicles/cars/get/id    
 @app.route('/vehicles/cars/get/id', methods=['GET', 'POST'])
 def get_car_by_id():
     req_data = request.form
     return carDB.get_car_by_id(req_data['id'])
 
-# curl -d make=Volvo http://127.0.0.1:5000/vehicles/cars/get/make                        
+
+# curl -d make=Volvo http://127.0.0.1:5000/vehicles/cars/get/make
 @app.route('/vehicles/cars/get/make', methods=['GET', 'POST'])
 def get_car_by_make():
     req_data = request.form
     return carDB.get_car_by_make(req_data['make'])
 
-# curl -d model=C40 http://127.0.0.1:5000/vehicles/cars/get/model    
+
+# curl -d model=C40 http://127.0.0.1:5000/vehicles/cars/get/model
 @app.route('/vehicles/cars/get/model', methods=['GET', 'POST'])
 def get_car_by_model():
     req_data = request.form
     return carDB.get_car_by_model(req_data['model'])
-    
+
+
 # http://127.0.0.1:5000/vehicles/cars/get/all  
 @app.route('/vehicles/cars/get/all')
 def show_all_available_cars():
     return carDB.show_all_available_cars()
+
 
 # ################################################
 # ######     RENTAL DATABASE INTERACTIONS
@@ -152,6 +191,7 @@ def update_rental_payment():
     rentalDB.update_rental_payment(req_data['id'], req_data['payment_status'])
     return {"status": "Rental successfully updated", "id": req_data['id']}
 
+
 # ################################################
 # ######     USER DATABASE INTERACTIONS
 # ################################################
@@ -170,7 +210,6 @@ def get_user_by_id():
 # upsert user
 @app.route('/user/upsert', methods=['POST'])
 def upsert_my_user():
-
     # secret
     public_key = "read_from_secret_file"
 
@@ -178,10 +217,11 @@ def upsert_my_user():
     token = request.headers["Authorization"].split(" ")[1]
 
     # check what format public key must have to make verify signature work
-    payload = jwt.decode(token, public_key, algorithms=["RS256"], options={"verify_signature": False})  # sub - authentication id
+    payload = jwt.decode(token, public_key, algorithms=["RS256"],
+                         options={"verify_signature": False})  # sub - authentication id
 
     # user_id = request.args.get('id')
-    req_data = request.form # user email - unique
+    req_data = request.form  # user email - unique
 
     auth_id = payload["sub"]
     email = req_data["email"]
@@ -213,6 +253,7 @@ def update_user():
             return {"status": "Update failed", "id": user_id}, 500
     except Exception as e:
         return {"status": "An error occurred", "message": str(e)}, 500
+
 
 # ################################################
 # ######     MAINTENANCE DATABASE INTERACTIONS

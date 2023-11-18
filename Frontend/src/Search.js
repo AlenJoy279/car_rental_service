@@ -21,20 +21,29 @@ import Chip from '@mui/material/Chip';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Slider from '@mui/material/Slider';
 import Stack from '@mui/joy/Stack';
+import { useNavigate } from 'react-router-dom';
 
 const defaultTheme = createTheme();
 
+export default function Search() {
+    const navigate = useNavigate();
 
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
 
-export default function SignIn() {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-  };
+        const queryParams = new URLSearchParams({
+            startDate: data.get('startDate'),
+            endDate: data.get('endDate'),
+            pickUpLocation: data.get('pickUpLocation'),
+            dropOffPoint: data.get('dropOffPoint'),
+            // Further params
+        }).toString();
+
+        // Navigate to SearchResults with query parameters
+        navigate(`/search-results?${queryParams}`);
+    };
+
 
     const [options, setSortOption] = React.useState('Name');
 
