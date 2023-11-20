@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useLocation } from 'react-router-dom';
 import { Grid, Card, CardContent, Typography } from '@mui/material';
+import { searchCars } from './API'; // Adjust the path as needed
 
 function SearchResults() {
     const [cars, setCars] = useState([]);
@@ -21,8 +21,8 @@ function SearchResults() {
 
         const fetchCars = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:9000/api/search', { params });
-                setCars(response.data);
+                const data = await searchCars(params);
+                setCars(data);
             } catch (error) {
                 console.error('Error fetching data:', error);
             } finally {

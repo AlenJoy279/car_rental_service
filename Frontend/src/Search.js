@@ -41,7 +41,7 @@ export default function Search() {
         }).toString();
 
         // Navigate to SearchResults with query parameters
-        navigate(`/search-results?${queryParams}`);
+        navigate(`/searchresults?${queryParams}`);
     };
 
 

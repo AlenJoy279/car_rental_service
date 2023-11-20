@@ -96,10 +96,10 @@ def search_cars():
     query = "SELECT * FROM Cars WHERE status='available'"
     conditions = []
 
-    if start_date:
-        conditions.append("start_date >= :start_date")
-    if end_date:
-        conditions.append("end_date <= :end_date")
+    # if start_date:
+    #     conditions.append("start_date >= :start_date")
+    # if end_date:
+    #     conditions.append("end_date <= :end_date")
     # More conditions
 
     query += " AND ".join(conditions)
@@ -107,11 +107,7 @@ def search_cars():
 
     try:
         cursor = carDB.conn.cursor()
-        cursor.execute(query, {
-            'start_date': start_date,
-            'end_date': end_date,
-            # More params
-        })
+        cursor.execute(query)
         results = cursor.fetchall()
         return jsonify(results)  # Convert results to JSON and return
     except Exception as e:

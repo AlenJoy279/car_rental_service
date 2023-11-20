@@ -32,3 +32,8 @@ export async function getAllAvailableCars() {
     return response.json();
  }
  
+export async function searchCars(params) {
+    const queryParams = new URLSearchParams(params).toString();
+    const response = await fetch(`${baseURL}/api/search?${queryParams}`);
+    return response.json();
+}
