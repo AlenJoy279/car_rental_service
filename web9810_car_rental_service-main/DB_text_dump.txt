@@ -1,0 +1,138 @@
+carDB:
+[
+	{
+		'id': 1,
+		'make': 'Volvo', 
+		'model': 'C40', 
+		'year': 2021,
+		'type': 'MPV',
+		'transmission': 'automatic', 
+		'powertrain': 'electric', 
+		'vin_number': '3902', 
+		'seats': 4, 
+		'cargo_cap': 65, 
+		'status': 'available', 
+		'range': 115
+	}, 
+	{
+		'id': 2, 
+		'make': 'Ford', 
+		'model': 'EcoSport', 
+		'year': 2020, 
+		'type': 'Sedan', 
+		'transmission': 'manual', 
+		'powertrain': 'petrol', 
+		'vin_number': '6412', 
+		'seats': 4, 
+		'cargo_cap': 45, 
+		'status': 'rented', 
+		'range': 90
+	}, 
+	{
+		'id': 3, 
+		'make': 'Toyota', 
+		'model': 'Prius', 
+		'year': 2017, 
+		'type': 'SUV', 
+		'transmission': 'automatic', 
+		'powertrain': 'electric', 
+		'vin_number': '4923', 
+		'seats': 5, 
+		'cargo_cap': 50, 
+		'status': 'available', 
+		'range': 80
+	}, 
+	{
+		'id': 4, 
+		'make': 'Ford', 
+		'model': 'F-150', 
+		'year': 2022, 
+		'type': 'Van', 
+		'transmission': 'manual', 
+		'powertrain': 'petrol', 
+		'vin_number': '3489', 
+		'seats': 3, 
+		'cargo_cap': 80, 
+		'status': 'maintenance', 
+		'range': 150
+	}, 
+	{
+		'id': 5, 
+		'make': 'BMW', 
+		'model': 'M2 Coupe', 
+		'year': 2016, 
+		'type': 'SUV', 
+		'transmission': 'manual', 
+		'powertrain': 'diesel', 
+		'vin_number': '2190', 
+		'seats': 4, 
+		'cargo_cap': 40, 
+		'status': 'available', 
+		'range': 170
+	}
+]
+rentalDB:
+[
+	   {
+		'id': 1, 
+		'user_id': 1, 
+		'car_id': 2, 
+		'pick_up': 'Dublin', 
+		'start_date': '2023-10-20', 
+		'start_time': 1697840966, 
+		'drop_off': 'Dublin', 
+		'end_date': '2023-10-29', 
+		'end_time': 1698622166, 
+		'total_cost': 810, 
+		'status': 'active', 
+		'payment_status': 'paid'
+	  }
+]
+userDB:
+[
+	{
+		'id': 1, 
+		'auth_id': '1', 
+		'full_name': 'Neil Perkins', 
+		'email': 'neilperkins@gmail.com', 
+		'phone': '0863817301'
+	}, 
+	{
+		'id': 2, 
+		'auth_id': '2', 
+		'full_name': 'Walter Young', 
+		'email': 'walteryoung@gmail.com', 
+		'phone': '0872010312'
+	}, 
+	{
+		'id': 3, 
+		'auth_id': '3', 
+		'full_name': 'Justin Kemp', 
+		'email': 'justinkemp@gmail.com', 
+		'phone': '08638918280'
+	}, 
+	{
+		'id': 4, 
+		'auth_id': '4', 
+		'full_name': 'Elena Armstrong', 
+		'email': 'elenaarmstrongh@gmail.com', 
+		'phone': '0863819304'
+	}, 
+	{
+		'id': 5, 
+		'auth_id': '5', 
+		'full_name': 'Nina Cantrell', 
+		'email': 'ninacantrell@gmail.com', 
+		'phone': '0877318230'
+	}
+]
+maintenanceDB:
+[
+	{
+		'id': 1, 
+		'car_id': 4, 
+		'start_date': '2023-10-29', 
+		'end_date': None, 
+		'desc': 'Tyre change'
+	}
+]
