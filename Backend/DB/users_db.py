@@ -33,6 +33,10 @@ class usersDB():
             self.curs.execute("INSERT INTO Users (user_id, auth_id, email, full_name, phone) VALUES (?, ?, ?, ?, ?)", 
                     (None, user.auth_id, user.email, user.full_name, user.phone))
                     
+    def delete_user(self, id):
+        with self.conn:
+            self.curs.execute("DELETE FROM Users WHERE user_id=?", (id,))
+                    
     def get_user_by_id(self, id):
         with self.conn:
             self.curs.execute("SELECT * FROM Users WHERE user_id=?", (id,))
