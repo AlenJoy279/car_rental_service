@@ -71,11 +71,11 @@ export default function Search() {
     };
 
     const handleBrandsChange = (event) => {
-      setSelectedBrands(event.target.value); // Correct method name
+      setSelectedBrands(event.target.value);
     };
 
     const handleTypesChange = (event) => {
-      setSelectedTypes(event.target.value); // Correct method name
+      setSelectedTypes(event.target.value);
     };
 
     React.useEffect(() => {
@@ -106,9 +106,6 @@ export default function Search() {
             },
         },
     };
-
-
-
 
     const [value, setValue] = React.useState([2, 7]);
 
@@ -219,7 +216,7 @@ export default function Search() {
                     )}
                     MenuProps={MenuProps}
                   >
-                    {manufacturers.map((name) => (
+                    {manufacturers.sort().map((name) => (
                       <MenuItem key={name} value={name}>
                         {name}
                       </MenuItem>
@@ -244,7 +241,7 @@ export default function Search() {
                       )}
                       MenuProps={MenuProps}
                     >
-                      {bodyTypes.map((type) => (
+                      {bodyTypes.sort().map((type) => (
                         <MenuItem key={type} value={type}>
                           {type}
                         </MenuItem>
