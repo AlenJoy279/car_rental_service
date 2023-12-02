@@ -37,3 +37,13 @@ export async function searchCars(params) {
     const response = await fetch(`${baseURL}/api/search?${queryParams}`);
     return response.json();
 }
+
+export async function getAllManufacturers() {
+    const response = await fetch(`${baseURL}/vehicles/manufacturers`);
+    return response.json();
+}
+
+export async function getAllBodyTypes() {
+    const response = await fetch(`${baseURL}/vehicles/bodytypes`);
+    return response.json();
+}

@@ -13,6 +13,8 @@ from flask_cors import CORS
 import jwt
 import sys
 
+from DB.utils import fetchall_conversion
+
 app = Flask(__name__)
 CORS(app, allow_headers="*")
 
@@ -83,16 +85,32 @@ def update_car():
     return {"status": "Car successfully updated", "id": req_data['id']}
 
 
+@app.route('/vehicles/manufacturers')  # Populate the list of possible makes for Search.js
+def get_all_manufacturers():
+    cursor = carDB.conn.cursor()
+    cursor.execute("SELECT DISTINCT make FROM Cars")
+    manufacturers = [row[0] for row in cursor.fetchall()]
+    return jsonify(manufacturers)
+
+
+@app.route('/vehicles/bodytypes')  # Populate the list of possible types for Search.js
+def get_all_body_types():
+    cursor = carDB.conn.cursor()
+    cursor.execute("SELECT DISTINCT type FROM Cars")
+    body_types = [row[0] for row in cursor.fetchall()]
+    return jsonify(body_types)
+
+
 @app.route('/api/search')
 def search_cars():
     # Extract query parameters
+    # Using parametrised queries to prevent SQL injection
     start_date = request.args.get('startDate')
     end_date = request.args.get('endDate')
     pick_up_location = request.args.get('pickUpLocation')
     drop_off_point = request.args.get('dropOffPoint')
     # More params
 
-    # Construct query based on parameters
     query = "SELECT * FROM Cars WHERE status='available'"
     conditions = []
 
@@ -102,13 +120,15 @@ def search_cars():
     #     conditions.append("end_date <= :end_date")
     # More conditions
 
-    query += " AND ".join(conditions)
-
+    if conditions:
+        query += " AND " + " AND ".join(conditions)
 
     try:
         cursor = carDB.conn.cursor()
         cursor.execute(query)
-        results = cursor.fetchall()
+        column_names = ['car_id', 'make', 'model', 'year', 'type', 'transmission', 'powertrain', 'vin_number', 'seats',
+                        'cargo_capacity', 'status', 'price_per_day', 'range']
+        results = fetchall_conversion(column_names, cursor.fetchall())
         return jsonify(results)  # Convert results to JSON and return
     except Exception as e:
         return {"status": "Error", "message": str(e)}

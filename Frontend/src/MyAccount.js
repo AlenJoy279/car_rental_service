@@ -8,7 +8,6 @@ import Container from "@mui/material/Container";
 import { Link } from 'react-router-dom';
 import { withAuthenticationRequired } from "@auth0/auth0-react";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import axios from 'axios';
 import { useAuth0 } from '@auth0/auth0-react';
 
 
@@ -24,8 +23,7 @@ const defaultTheme = createTheme();
 // After they have created an account
 const MyAccount = () => {
 
-    // Only a placeholder for now to reflect one logged-in user
-    // Will have to read the email/auth id in from auth0 and search in the db for them
+
     const [userState, setUserState] = useState(
       {
         user_id: 0,
@@ -70,9 +68,8 @@ const MyAccount = () => {
             // Update state with the fetched data
             setFormData(prevFormData => ({
               ...prevFormData,
-                firstName: userData.email_text ? userData.email_text.split(' ')[0] : '',
-                lastName: userData.email_text && userData.email_text.split(' ').length > 1 ? userData.email_text.split(' ')[1] : '',
-                email: userData.full_name || '',
+                fullName: userData.full_name || "",
+                email: userData.email_text || '',
                 phoneNumber: userData.phone || '',
 
             }));
@@ -169,7 +166,7 @@ const MyAccount = () => {
         }
       }
     };
-    
+
       return (
         <ThemeProvider theme={defaultTheme}>
         <Container component="main" maxWidth="xs">
@@ -237,17 +234,15 @@ const MyAccount = () => {
             <Button type="submit" variant="contained" fullWidth>
               Update Settings
             </Button>
-    
+
           </Box>
         </form>
         </Box>
         </Container>
         </ThemeProvider>
       );
-}    
+}
 
 export default withAuthenticationRequired(MyAccount, {
     onRedirecting: () => <Home/>
 })
-
-
