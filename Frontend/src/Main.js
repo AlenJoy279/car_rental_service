@@ -20,7 +20,7 @@ import MyAccount from "./MyAccount";
 import About from "./About";
 import Home from "./Home";
 import ManageBookings from "./ManageBookings";
-
+import SearchResults from "./SearchResults";
 
 
 const defaultTheme = createTheme();
@@ -65,6 +65,7 @@ class Main extends Component {
                                 <Route path="/search" element={<Search/>}/>
                                 <Route path="/about" element={<About/>}/>
                                 <Route path="/managebookings" element={<ManageBookings/>}/>
+                                <Route path="/searchresults" element={<SearchResults/>}/>
                             </Routes>
                         </Box>
                     </Grid>

@@ -13,58 +13,89 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Chip from '@mui/material/Chip';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import Slider from '@mui/material/Slider';
 import Stack from '@mui/joy/Stack';
+import { useNavigate } from 'react-router-dom';
+import {Grid} from "@mui/material";
+import { getAllManufacturers, getAllBodyTypes } from './API';
 
 const defaultTheme = createTheme();
 
+export default function Search() {
+    const navigate = useNavigate();
+    const [startDate, setStartDate] = React.useState(null);
+    const [endDate, setEndDate] = React.useState(null);
+    const [sortBy, setSortBy] = React.useState('make');
+    const [selectedBrands, setSelectedBrands] = React.useState([]);
+    const [selectedTypes, setSelectedTypes] = React.useState([]);
+    const [manufacturers, setManufacturers] = React.useState([]);
+    const [bodyTypes, setBodyTypes] = React.useState([]);
 
 
-export default function SignIn() {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-  };
+    const handleSubmit = (event) => {
+        event.preventDefault();
 
-    const [options, setSortOption] = React.useState('Name');
+        // Validation: Check if required fields are filled
+        if (!startDate || !endDate || !event.currentTarget.pickUpLocation.value || !event.currentTarget.dropOffPoint.value) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+
+        const data = new FormData(event.currentTarget);const formData = {};
+        data.forEach((value, key) => (formData[key] = value));
+        console.log(formData);
+
+
+        const queryParams = new URLSearchParams({
+            startDate: startDate?.format('YYYY-MM-DD') || '',
+            endDate: endDate?.format('YYYY-MM-DD') || '',
+            pickUpLocation: data.get('pickUpLocation'),
+            dropOffPoint: data.get('dropOffPoint'),
+            sortBy,
+            brands: selectedBrands.join(','),
+            types: selectedTypes.join(','),
+            // Further params
+        }).toString();
+
+
+        // Navigate to SearchResults with query parameters
+        console.log(formData)
+        navigate(`/searchresults?${queryParams}`);
+    };
 
     const handleSortChange = (event) => {
-        setSortOption(event.target.value);
+    setSortBy(event.target.value);
     };
 
-    const [tOptions, setTOption] = React.useState('Any'); // Transmission options
-
-    const handleTChange = (event) => {
-        setTOption(event.target.value);
+    const handleBrandsChange = (event) => {
+      setSelectedBrands(event.target.value);
     };
 
-    const [powertrainOptions, setPowertrainOption] = React.useState('Any'); // Transmission options
-
-    const handlePowertrainChange = (event) => {
-        setPowertrainOption(event.target.value);
+    const handleTypesChange = (event) => {
+      setSelectedTypes(event.target.value);
     };
 
-    const [manufacturerName, setManufacturerName] = React.useState([]);
+    React.useEffect(() => {
+        async function fetchFilters() {
+            try {
+                const manufacturersData = await getAllManufacturers();
+                const bodyTypesData = await getAllBodyTypes();
 
-    const handleManufacturerSel = (event) => {
-        const {
-            target: { value },
-        } = event;
-        setManufacturerName(
-            // On autofill, we get a stringified value.
-            typeof value === 'string' ? value.split(',') : value,
-        );
-    };
+                setManufacturers(manufacturersData);
+                setBodyTypes(bodyTypesData);
+            } catch (error) {
+                console.error('Error fetching filter options:', error);
+            }
+        }
+
+        fetchFilters();
+    }, []);
+
+
 
     const ITEM_HEIGHT = 48;
     const ITEM_PADDING_TOP = 8;
@@ -76,49 +107,6 @@ export default function SignIn() {
             },
         },
     };
-
-    const manufacturers = [ // placeholder until db is populated
-        'Audi',
-        'Bentley',
-        'BMW',
-        'Citroen',
-        'Chevrolet',
-        'Dacia',
-        'Fiat',
-        'Ford',
-        'Lexus',
-        'Mercedes',
-        'Nissan',
-        'Opel',
-        'Porsche',
-        'Tesla',
-        'Toyota'
-    ];
-
-    const types = [ // placeholder until db is populated
-        'SUV',
-        'Sedan',
-        'Coupe',
-        'Hybrid',
-        'Electric',
-        'Hatchback',
-        'Luxury',
-        'Sports',
-        'Convertible',
-    ];
-
-    const [typeName, setTypeName] = React.useState([]);
-
-    const handleTypeSel = (event) => {
-        const {
-            target: { value },
-        } = event;
-        setTypeName(
-            typeof value === 'string' ? value.split(',') : value,
-        );
-    };
-
-
 
     const [value, setValue] = React.useState([2, 7]);
 
@@ -141,204 +129,136 @@ export default function SignIn() {
           <Typography component="h1" variant="h5">
             What we are looking for today?
           </Typography>
-            <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <DatePicker
+                    disablePast
 
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={['DatePicker', 'DatePicker', 'DatePicker']}>
-                        <DatePicker
-                            margin="normal"
-                            fullWidth
-                            id="startDate"
-                            label="Start Date"
-                            name="startDate"
-                            autoFocus
-                            slotProps={{textField:{required: true}}}
-                        />
-                    </DemoContainer>
-                </LocalizationProvider>
+                    label="Start Date"
+                    value={startDate}
+                    onChange={setStartDate}
+                    renderInput={(params) => <TextField {...params} fullWidth />}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <DatePicker
+                    disablePast
+                    label="End Date"
+                    value={endDate}
+                    onChange={setEndDate}
+                    minDate={startDate}
+                    renderInput={(params) => <TextField {...params} fullWidth />}
+                  />
+                </Grid>
+              </Grid>
+            </LocalizationProvider>
 
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={['DatePicker', 'DatePicker', 'DatePicker']}>
-                        <DatePicker
-                            margin="normal"
-                            fullWidth
-                            id="endDate"
-                            label="End Date"
-                            name="endDate"
-                            slotProps={{textField:{required: true}}}
-                        />
-                    </DemoContainer>
-                </LocalizationProvider>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="pickUpLocation"
+              label="Pick-up location"
+              id="pickUpLocation"
+              autoComplete="pick-up location"
+            />
 
-                <TextField
-                    margin="normal"
-                    required
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="dropOffPoint"
+              label="Drop-off point"
+              id="dropOffPoint"
+              autoComplete="drop-off point"
+            />
+
+            <InputLabel id="sortByLabel">Sort by</InputLabel>
+              <Select
+                labelId="sortByLabel"
+                id="demoSort"
+                value={sortBy}
+                onChange={handleSortChange}
+                fullWidth
+              >
+                <MenuItem value={"make"}>Name</MenuItem>
+                <MenuItem value={"price_per_day"}>Price Per Day (dsc)</MenuItem>
+                <MenuItem value={"year"}>Year</MenuItem>
+                <MenuItem value={"Cargo capacity"}>Cargo Capacity</MenuItem>
+              </Select>
+
+
+            <Accordion>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
+              >
+                <Typography>More search parameters</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Stack spacing={1.5}>
+
+                  <InputLabel id="manufacturerChipSelLabel">Brand(s)</InputLabel>
+                  <Select
+                    labelId="manufacturerChipSelLabel"
+                    id="manufacturerChipSel"
+                    value={selectedBrands}
+                    onChange={handleBrandsChange}
+                    input={<OutlinedInput id="select-multiple-chip" label="Brand(s)" />}
+                    multiple
                     fullWidth
-                    name="pickUpLocation"
-                    label="Pick-up location"
-                    id="pickUpLocation"
-                    autoComplete="Pick-up location"
-                />
+                    renderValue={(selected) => (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {selected.map((value) => (
+                          <Chip key={value} label={value} />
+                        ))}
+                      </Box>
+                    )}
+                    MenuProps={MenuProps}
+                  >
+                    {manufacturers.sort().map((name) => (
+                      <MenuItem key={name} value={name}>
+                        {name}
+                      </MenuItem>
+                    ))}
+                  </Select>
 
-                <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="dropOffPoint"
-                    label="Drop-off point"
-                    id="dropOffPoint"
-                    autoComplete="Drop-off point"
-                />
+                  <InputLabel id="typeChipSelLabel">Type(s)</InputLabel>
+                  <Select
+                      labelId="typeChipSelLabel"
+                      id="typeChipSel"
+                      value={selectedTypes}
+                      onChange={handleTypesChange}
+                      input={<OutlinedInput id="select-multiple-chip-type" label="Type(s)" />}
+                      multiple
+                      fullWidth
+                      renderValue={(selected) => (
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                          {selected.map((value) => (
+                            <Chip key={value} label={value} />
+                          ))}
+                        </Box>
+                      )}
+                      MenuProps={MenuProps}
+                    >
+                      {bodyTypes.sort().map((type) => (
+                        <MenuItem key={type} value={type}>
+                          {type}
+                        </MenuItem>
+                      ))}
+                    </Select>
 
-                <Accordion>
-                    <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        aria-controls="panel1a-content"
-                        id="panel1a-header"
-                        >
-                    <Typography>
-                        More search parameters
-                    </Typography>
-                    
-                    </AccordionSummary>
-                    <AccordionDetails>
-                            {/*Following filters can also be reused for search results page*/}
-                            <Stack spacing={1.5}>
-                            <InputLabel id="sortByLabel">Sort by</InputLabel>
-                            <Select
-                                labelId="sortByLabel"
-                                id="demoSort"
-                                margin="normal"
-                                fullWidth
-                                value={options}
-                                label="options"
-                                onChange={handleSortChange}
-                            >
-                                <MenuItem value={"Name"}>Name</MenuItem>
-                                <MenuItem value={"Price per day(asc)"}>Price Per Day (asc)</MenuItem>
-                                <MenuItem value={"Price per day(dsc)"}>Price Per Day (dsc)</MenuItem>
-                                <MenuItem value={"Highest rated"}>Highest Rated</MenuItem>
-                                <MenuItem value={"Cargo capacity"}>Cargo Capacity</MenuItem>
-                            </Select>
+                </Stack>
+              </AccordionDetails>
+            </Accordion>
 
-                            <InputLabel id="manufacturerChipSelLabel">Brand(s)</InputLabel>
-                            <Select
-                                labelId="manufacturerChipSelLabel"
-                                id="manufacturerChipSel"
-                                margin="normal"
-                                fullWidth
-                                multiple
-                                value={manufacturerName}
-                                onChange={handleManufacturerSel}
-                                input={<OutlinedInput id="select-multiple-chip" label="Brand(s)" />}
-                                renderValue={(selected) => ( // Add logic for placeholder if selection is empty
-                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                        {selected.map((value) => (
-                                            <Chip key={value} label={value} />
-                                        ))}
-                                    </Box>
-                                )}
-                                MenuProps={MenuProps}
-                            >
-                                <MenuItem disabled value="">
-                                    <em>All</em>
-                                </MenuItem>
-                                {manufacturers.map((name) => (
-                                    <MenuItem
-                                        key={name}
-                                        value={name}
-                                    >
-                                        {name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-
-                            <InputLabel id="selPowertrainLabel">Powertrain</InputLabel>
-                            <Select
-                                labelId="selPowertrainLabel"
-                                id="demoPowertrain"
-                                margin="normal"
-                                fullWidth
-                                value={powertrainOptions}
-                                label="powertrainOptions"
-                                onChange={handlePowertrainChange}
-                            >
-                                <MenuItem value={"Any"}>Any</MenuItem>
-                                <MenuItem value={"Hybrid"}>Hybrid</MenuItem>
-                                <MenuItem value={"Electric"}>Electric</MenuItem>
-                                <MenuItem value={"Petrol"}>Petrol</MenuItem>
-                                <MenuItem value={"Diesel"}>Diesel</MenuItem>
-                            </Select>
-
-                            <InputLabel id="selTransmissionLabel">Transmission</InputLabel>
-                            <Select
-                                labelId="selTransmissionLabel"
-                                id="demoTransmission"
-                                margin="normal"
-                                fullWidth
-                                value={tOptions}
-                                label="tOptions"
-                                onChange={handleTChange}
-                            >
-                                <MenuItem value={"Any"}>Any</MenuItem>
-                                <MenuItem value={"Manual"}>Manual</MenuItem>
-                                <MenuItem value={"Automatic"}>Automatic</MenuItem>
-                            </Select>
-
-                            <InputLabel id="selSeats">Seats</InputLabel>
-                            <Slider
-                                getAriaLabel={() => 'Seating capacity'}
-                                value={value}
-                                min={2}
-                                max={7}
-                                onChange={handleSliderChange}
-                                valueLabelDisplay="auto"
-                            />
-
-                                <InputLabel id="typeChipSelLabel">Type(s)</InputLabel>
-                            <Select
-                                labelId="typeChipSelLabel"
-                                id="typeChipSel"
-                                margin="normal"
-                                fullWidth
-                                multiple
-                                value={typeName}
-                                onChange={handleTypeSel}
-                                input={<OutlinedInput id="select-multiple-chip-type" label="Type(s)" />}
-                                renderValue={(selected) => ( // Add logic for placeholder if selection is empty
-                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                        {selected.map((value) => (
-                                            <Chip key={value} label={value} />
-                                        ))}
-                                    </Box>
-                                )}
-                                MenuProps={MenuProps}
-                            >
-                                <MenuItem disabled value="">
-                                    <em>All</em>
-                                </MenuItem>
-                                {types.map((name) => (
-                                    <MenuItem
-                                        key={name}
-                                        value={name}
-                                    >
-                                        {name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                            </Stack>
-                    </AccordionDetails>
-                </Accordion>
-
-                <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    sx={{ mt: 3, mb: 2 }}
-                >
-                    Search
-                </Button>
-              </Box>
+            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+              Search
+            </Button>
+          </Box>
         </Box>
       </Container>
     </ThemeProvider>

@@ -8,7 +8,6 @@ import Container from "@mui/material/Container";
 import { Link } from 'react-router-dom';
 import { withAuthenticationRequired } from "@auth0/auth0-react";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import axios from 'axios';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Alert } from "@mui/material";
 
@@ -24,12 +23,11 @@ const defaultTheme = createTheme();
 // After they have created an account
 const MyAccount = () => {
 
-    // Only a placeholder for now to reflect one logged-in user
-    // Will have to read the email/auth id in from auth0 and search in the db for them
+
     const [userState, setUserState] = useState(
       {
         user_id: 0,
-        token: "",  
+        token: "",
       }
     ) 
 
@@ -45,9 +43,9 @@ const MyAccount = () => {
         email: '',
         phoneNumber: '',
       });
-    
+
       const [errors, setErrors] = useState({});
-    
+
     // Function to clear the form
     const clearForm = () => {
       setFormData({
@@ -64,12 +62,12 @@ const MyAccount = () => {
           try {
 
             let token = await getAccessTokenSilently()
-            
+
             const response = await upsertUser(token, user.email);
             const userData = response[0]
-            
+
             console.log("userData", userData)
-           
+
             // set user state
             setUserState({user_id: userData.id, token: token});
 
@@ -91,7 +89,7 @@ const MyAccount = () => {
     fetchData();
     }, []);
 
-    
+
     // remove trailing symbols and replace multiple whitespaces with one
     const normalizeValue = (name, value) => {
       if (name == "fullName" || name == "phoneNumber") {return value.trim().replace(/  +/g, ' ')};
@@ -102,7 +100,7 @@ const MyAccount = () => {
     const handleChange = (e) => {
       const { name, value } = e.target;
       setFormData({ ...formData, [name]: value});
-      setErrors({ ...errors, [name]: '' });      
+      setErrors({ ...errors, [name]: '' });
     };
 
 
@@ -147,7 +145,7 @@ const MyAccount = () => {
       e.preventDefault();
       let validationErrors = checkErrors();
       // setErrors(validationErrors);
-      
+
       if (Object.keys(validationErrors).length > 0) {
         setErrors(validationErrors);
       } else {
@@ -158,11 +156,11 @@ const MyAccount = () => {
         };
         console.log(formData);
         setFormData(formData);
-        
+
         try {
           const response = await updateUser(
-            userState.token, 
-            userState.user_id, 
+            userState.token,
+            userState.user_id,
             {full_name: formData.fullName, phone: formData.phoneNumber}
           );
 
@@ -173,7 +171,7 @@ const MyAccount = () => {
         }
       }
     };
-    
+
       return (
         <ThemeProvider theme={defaultTheme}>
         <Container component="main" maxWidth="xs">
@@ -244,19 +242,17 @@ const MyAccount = () => {
             <Button type="submit" variant="contained" fullWidth>
               Update Settings
             </Button>
-    
+
           </Box>
         </form>
         </Box>
         </Container>
         </ThemeProvider>
       );
-}    
+}
 
 
 // check if auntheticated, if not -> MyAcocunt wouldn't be available
 export default withAuthenticationRequired(MyAccount, {
     onRedirecting: () => <Home/>
 })
-
-

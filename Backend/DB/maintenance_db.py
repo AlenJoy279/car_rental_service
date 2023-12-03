@@ -8,7 +8,10 @@ class maintenanceDB():
         self.conn.execute('PRAGMA foreign_keys = ON')
         self.curs = self.conn.cursor()
         self.default_maintenance = [
-            (None, 4, '2023-10-29', None, 'Tyre change')
+            (None, 4, '2023-11-29', '2023-12-08', 'Tyre change'),
+            (None, 10, '2023-11-05', '2023-12-15', 'Paint Job'),
+            (None, 17, '2023-11-10', '2023-12-20', 'Suspension Check'),
+            (None, 25, '2023-11-15', '2023-12-25', 'Transmission Repair'),
         ]
         self.keys = ('id', 'car_id', 'start_date', 'end_date', 'desc')
         

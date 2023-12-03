@@ -64,84 +64,53 @@ export async function getAllAvailableCars() {
     return response.json();
 }
  
-
-// delete_cars
-export async function deleteCar(token, id) {
-    let params = new URLSearchParams({id: id});
-    const response =  await fetch(
-        baseURL + '/vehicles/cars/delete', 
-        {headers: {"Authorization": "Bearer " + token}, method: "GET", body: params}
-        );
+export async function searchCars(params) {
+    const queryParams = new URLSearchParams(params).toString();
+    const response = await fetch(`${baseURL}/api/search?${queryParams}`);
     return response.json();
 }
 
-
-// update_car
-export async function updateCar(id, data) {
-    let params = new URLSearchParams({id: id, status: data.status});
-    const response =  await fetch(
-        baseURL + '/vehicles/cars/update', 
-        {method: "PUT", body: params}
-        );
+export async function getAllManufacturers() {
+    const response = await fetch(`${baseURL}/vehicles/manufacturers`);
     return response.json();
 }
 
-
-// get_car_by_id
-export async function getCarByID(id) {
-    let params = new URLSearchParams({id: id});
-    const response = await fetch(
-        baseURL + '/vehicles/cars/get/id', 
-        {method: "POST", body: params}
-        );
+export async function getAllBodyTypes() {
+    const response = await fetch(`${baseURL}/vehicles/bodytypes`);
     return response.json();
 }
 
+// rentals
 
-// get_car_by_make
-export async function getCarByMake(make) {
-    let params = new URLSearchParams({make: make});
-    const response = await fetch(
-        baseURL + '/vehicles/cars/get/make', 
-        {method: "POST", body: params}
-        );
+export async function createRental(token, rentalData) {
+    let params = new URLSearchParams(rentalData);
+    const response = await fetch(baseURL + "/vehicles/rentals/add", {
+        headers: {"Authorization": "Bearer " + token},
+        method: "POST",
+        body: params
+    });
     return response.json();
 }
 
-
-// get_car_by_model
-export async function getCarByModel(model) {
-    let params = new URLSearchParams({model: model});
-    const response = await fetch(
-        baseURL + '/vehicles/cars/get/model', 
-        {method: "POST", body: params}
-        );
+export async function getUserRentals(userId) {
+    const response = await fetch(`${baseURL}/vehicles/rentals/get/user?user_id=${userId}`);
     return response.json();
 }
 
+export async function getCarById(carId) {
+    const response = await fetch(`${baseURL}/vehicles/cars/get/id`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({ id: carId })
+    });
+    return response.json();
+}
 
-//  insert_car
-export async function insertCar(token, id, data) {
-    let params = new URLSearchParams(
-        {
-            id: id, 
-            make: data.make, 
-            model: data.model,
-            year: data.year,
-            type: data.type,
-            transmission: data.transmission,
-            powertrain: data.powertrain,
-            vin_number: data.vin_number,
-            seats: data.seats,
-            cargo_cap: data.cargo_cap,
-            status: data.status,
-            price_per_day: data.price_per_day,
-            range: data.range            
-        }
-    );
-    const response = await fetch(
-        baseURL + "/vehicles/cars/add", 
-        {headers: {"Authorization": "Bearer " + token}, method: "PUT", body: params}
-        );
-    return response.json()
+export async function deleteRental(rentalId) {
+    const response = await fetch(`${baseURL}/vehicles/rentals/delete/${rentalId}`, {
+        method: 'DELETE',
+    });
+    return response.json();
 }
