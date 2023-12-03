@@ -2,6 +2,7 @@ from BO.car import car
 from DB.utils import fetchall_conversion
 import sqlite3
 
+
 class carsDB():
     def __init__(self):
         self.conn = sqlite3.connect('DB/car_rental_user_maintenance.db', check_same_thread=False)
@@ -45,17 +46,18 @@ class carsDB():
             (None, 'Porsche', 'Taycan', 2021, 'Sport', 'automatic', 'electric', '1025', 4, 100, 'available', 400, 450),
             (None, 'Lincoln', 'Navigator', 2020, 'SUV', 'automatic', 'petrol', '1026', 7, 600, 'available', 180, None),
             (
-            None, 'Alfa Romeo', 'Giulia', 2019, 'Sedan', 'automatic', 'petrol', '1027', 5, 350, 'available', 150, None),
+                None, 'Alfa Romeo', 'Giulia', 2019, 'Sedan', 'automatic', 'petrol', '1027', 5, 350, 'available', 150,
+                None),
             (None, 'Chrysler', 'Pacifica', 2021, 'Van', 'automatic', 'hybrid', '1028', 7, 500, 'available', 120, None),
             (None, 'Genesis', 'G70', 2022, 'Sedan', 'automatic', 'petrol', '1029', 5, 350, 'available', 170, None),
             (None, 'Maserati', 'Ghibli', 2017, 'Sedan', 'automatic', 'petrol', '1030', 5, 400, 'available', 200, None),
 
         ]
         self.keys = ('id', 'make', 'model', 'year', 'type', 'transmission', 'powertrain', 'vin_number',
-            'seats', 'cargo_cap', 'status', 'price_per_day', 'range')
-        
+                     'seats', 'cargo_cap', 'status', 'price_per_day', 'range')
+
     def init_db(self):
-           self.curs.execute("""CREATE TABLE IF NOT EXISTS Cars (
+        self.curs.execute("""CREATE TABLE IF NOT EXISTS Cars (
                 car_id integer PRIMARY KEY AUTOINCREMENT,
                 make text NOT NULL,
                 model text NOT NULL,
@@ -69,40 +71,44 @@ class carsDB():
                 status text CHECK(status IN ('available', 'rented', 'maintenance')),
                 price_per_day integer NOT NULL,
                 range integer)""")
-                
+
     def populate_cars(self):
         with self.conn:
             self.curs.executemany("INSERT INTO Cars VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", self.default_cars)
-        
+
     def insert_car(self, car):
         with self.conn:
-            self.curs.execute("INSERT INTO Cars VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
-                    (None, car.make, car.model, car.year, car.type, car.transmission, car.powertrain, car.vin_number,
-                        car.seats, car.cargo_capacity, car.status, car.price_per_day, car.range))
-                        
+            self.curs.execute("INSERT INTO Cars VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                              (None, car.make, car.model, car.year, car.type, car.transmission, car.powertrain,
+                               car.vin_number,
+                               car.seats, car.cargo_capacity, car.status, car.price_per_day, car.range))
+
     def delete_car(self, id):
         with self.conn:
             self.curs.execute("DELETE FROM Cars WHERE car_id=?", (id,))
-            
+
     def get_car_by_id(self, id):
         with self.conn:
-            self.curs.execute("SELECT * FROM Cars WHERE car_id=?", (id,))
-            return fetchall_conversion(self.keys, self.curs.fetchall())
-           
+            curs = self.conn.cursor()
+            curs.execute("SELECT * FROM Cars WHERE car_id=?", (id,))
+            result = fetchall_conversion(self.keys, curs.fetchall())
+            curs.close()
+            return result
+
     def get_car_by_make(self, make):
         with self.conn:
             self.curs.execute("SELECT * FROM Cars WHERE make=? AND status='available'", (make,))
             return fetchall_conversion(self.keys, self.curs.fetchall())
-            
+
     def get_car_by_model(self, model):
         with self.conn:
             self.curs.execute("SELECT * FROM Cars WHERE model=? AND status='available'", (model,))
             return fetchall_conversion(self.keys, self.curs.fetchall())
-            
+
     def update_car_status(self, id, status):
         with self.conn:
             self.curs.execute("UPDATE Cars SET status=? WHERE car_id=?", (status, id))
-            
+
     def show_all_available_cars(self):
         with self.conn:
             self.curs.execute("SELECT * FROM Cars WHERE status='available'")
