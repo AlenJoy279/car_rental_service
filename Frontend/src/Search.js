@@ -18,7 +18,6 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Chip from '@mui/material/Chip';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import Slider from '@mui/material/Slider';
 import Stack from '@mui/joy/Stack';
 import { useNavigate } from 'react-router-dom';
 import {Grid} from "@mui/material";
@@ -39,12 +38,14 @@ export default function Search() {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        for (let [key, value] of data.entries()) {
-            console.log(`${key}: ${value}`);
+
+        // Validation: Check if required fields are filled
+        if (!startDate || !endDate || !event.currentTarget.pickUpLocation.value || !event.currentTarget.dropOffPoint.value) {
+            alert('Please fill in all required fields.');
+            return;
         }
 
-        const formData = {};
+        const data = new FormData(event.currentTarget);const formData = {};
         data.forEach((value, key) => (formData[key] = value));
         console.log(formData);
 
@@ -134,6 +135,7 @@ export default function Search() {
                 <Grid item xs={6}>
                   <DatePicker
                     disablePast
+
                     label="Start Date"
                     value={startDate}
                     onChange={setStartDate}

@@ -6,7 +6,7 @@ from DB.cars_db import carsDB
 from DB.maintenance_db import maintenanceDB
 from DB.rentals_db import rentalsDB
 from DB.users_db import usersDB
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, current_app
 from flask_cors import CORS
 
 # token validation
@@ -40,7 +40,6 @@ if "populate" in sys.argv:
     maintenanceDB.populate_maintenance()
 
 
-
 # @app.after_request
 # def add_default_headers(response):
 #     response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
@@ -69,8 +68,9 @@ def insert_car():
                   req_data['cargo_cap'], req_data['status'], req_data['price_per_day'], req_data['range'])
     carDB.insert_car(new_car)
     return {"status": "Car successfully inserted",
-        "make": req_data['make'], "model": req_data['model'], "year": req_data['year']}
-  
+            "make": req_data['make'], "model": req_data['model'], "year": req_data['year']}
+
+
 @app.route('/vehicles/cars/delete', methods=['GET', 'POST'])
 def delete_car():
     req_data = request.form
@@ -138,7 +138,8 @@ def search_cars():
     try:
         cursor = carDB.conn.cursor()
         cursor.execute(query, params)
-        column_names = ['car_id', 'make', 'model', 'year', 'type', 'transmission', 'powertrain', 'vin_number', 'seats', 'cargo_capacity', 'status', 'price_per_day', 'range']
+        column_names = ['car_id', 'make', 'model', 'year', 'type', 'transmission', 'powertrain', 'vin_number', 'seats',
+                        'cargo_capacity', 'status', 'price_per_day', 'range']
         results = fetchall_conversion(column_names, cursor.fetchall())
         return jsonify(results)  # Convert results to JSON and return
     except Exception as e:
@@ -151,20 +152,24 @@ def get_car_by_id():
     req_data = request.form
     return carDB.get_car_by_id(req_data['id'])
 
+
 @app.route('/vehicles/cars/get/make', methods=['GET', 'POST'])
 def get_car_by_make():
     req_data = request.form
     return carDB.get_car_by_make(req_data['make'])
 
+
 @app.route('/vehicles/cars/get/model', methods=['GET', 'POST'])
 def get_car_by_model():
     req_data = request.form
     return carDB.get_car_by_model(req_data['model'])
-    
+
+
 @app.route('/vehicles/cars/get/all')
 def show_all_available_cars():
     return carDB.show_all_available_cars()
-    
+
+
 # ################################################
 # ######     RENTAL DATABASE INTERACTIONS
 # ################################################
@@ -183,11 +188,13 @@ def insert_rental():
         return {"status": "An error occurred", "message": str(e)}, 500
 
 
-@app.route('/vehicles/rentals/delete', methods=['GET', 'POST'])
-def delete_rental():
-    req_data = request.form
-    rentalDB.delete_rental(req_data['id'])
-    return {"status": "Rental successfully deleted", "id": req_data['id']}
+@app.route('/vehicles/rentals/delete/<int:rental_id>', methods=['DELETE'])
+def delete_rental(rental_id):
+    try:
+        rentalDB.delete_rental(rental_id)
+        return {"status": "Rental successfully deleted", "id": rental_id}
+    except Exception as e:
+        return {"status": "An error occurred", "message": str(e)}, 500
 
 
 @app.route('/vehicles/rentals/get/id', methods=['GET', 'POST'])
@@ -210,6 +217,9 @@ def update_rental_status():
     except Exception as e:
         return {"status": "An error occurred", "message": str(e)}, 500
 
+@app.route('/test')
+def test_route():
+    return jsonify({"message": "Test route is working!"})
 
 @app.route('/vehicles/rentals/update/payment', methods=['GET', 'POST'])
 def update_rental_payment():
@@ -219,6 +229,17 @@ def update_rental_payment():
         return {"status": "Rental successfully updated", "id": req_data['id']}
     except Exception as e:
         return {"status": "An error occurred", "message": str(e)}, 500
+
+
+@app.route('/vehicles/rentals/get/user', methods=['GET', 'POST'])
+def get_rentals_by_user():
+    user_id = request.args.get('user_id')
+    try:
+        rentals = rentalDB.get_rentals_by_user(user_id)
+        return jsonify(rentals)
+    except Exception as e:
+        return {"status": "An error occurred", "message": str(e)}, 500
+
 
 # ################################################
 # ######     USER DATABASE INTERACTIONS
@@ -247,15 +268,16 @@ def delete_user():
 def upsert_my_user():
     # secret
     public_key = "read_from_secret_file"
-    
+
     # get user data from token
     token = request.headers["Authorization"].split(" ")[1]
 
     # check what format public key must have to make verify signature work
-    payload = jwt.decode(token, public_key, algorithms=["RS256"], options={"verify_signature": False})  # sub - authentication id
+    payload = jwt.decode(token, public_key, algorithms=["RS256"],
+                         options={"verify_signature": False})  # sub - authentication id
 
     # user_id = request.args.get('id')
-    req_data = request.form # user email - unique 
+    req_data = request.form  # user email - unique
 
     auth_id = payload["sub"]
     email = req_data["email"]
@@ -264,7 +286,7 @@ def upsert_my_user():
     # add error handling based on the error type returned
     try:
         user_object = userDB.insert_user(user(auth_id, email, "", ""))
-    
+
     except Exception as e:
         print(e)
 
@@ -277,7 +299,7 @@ def upsert_my_user():
 def update_user():
     req_data = request.form
     user_id = req_data["id"]
-    
+
     try:
         update_status = userDB.update_user_by_id(user_id, req_data)
 
@@ -287,6 +309,7 @@ def update_user():
             return {"status": "Update failed", "id": user_id}, 500
     except Exception as e:
         return {"status": "An error occurred", "message": str(e)}, 500
+
 
 # ################################################
 # ######     MAINTENANCE DATABASE INTERACTIONS
