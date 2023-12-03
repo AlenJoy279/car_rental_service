@@ -6,11 +6,10 @@ from DB.cars_db import carsDB
 from DB.maintenance_db import maintenanceDB
 from DB.rentals_db import rentalsDB
 from DB.users_db import usersDB
-from flask import Flask, request
+from flask import Flask, request, abort
 from flask_cors import CORS
+from jwc_token import decode_auth_token
 
-# token validation
-import jwt
 import sys
 
 app = Flask(__name__)
@@ -148,67 +147,113 @@ def update_rental_payment():
     rentalDB.update_rental_payment(req_data['id'], req_data['payment_status'])
     return {"status": "Rental successfully updated", "id": req_data['id']}
 
+
+
 # ################################################
 # ######     USER DATABASE INTERACTIONS
 # ################################################
 
+# user related data shall be handled through protected API calls
+# 
+
+# get user by id / protected API calls 
 @app.route('/users/get/all', methods=['GET', 'POST'])
 def show_all_users():
-    return userDB.show_all_users()
+    try:
+
+        auth_id = decode_auth_token(request)
+
+        # JWT token is validated
+        if not auth_id == False:
+            return userDB.show_all_users()
+
+        # JWT token is not validated
+        else:
+            return abort(401)
+
+    except Exception as e:
+        return {"status": "An error occurred", "message": str(e)}, 500
 
 
+# get user by id / protected API calls
 @app.route('/user/get/id', methods=['GET'])
 def get_user_by_id():
-    user_id = request.args.get('id')
-    return userDB.get_user_by_id(user_id)
+
+    try:
+
+        auth_id = decode_auth_token(request)
+
+        # JWT token is validated
+        if not auth_id == False:
+
+            user_id = request.args.get('id')
+            return userDB.get_user_by_id(user_id)
+
+        # JWT token is not validated
+        else:
+            return abort(401)
+
+    except Exception as e:
+        return {"status": "An error occurred", "message": str(e)}, 500
 
 
-# upsert user
+# upsert user / protected API calls
 @app.route('/user/upsert', methods=['POST'])
 def upsert_my_user():
 
-    # secret
-    public_key = "read_from_secret_file"
-    
-    # get user data from token
-    token = request.headers["Authorization"].split(" ")[1]
-
-    # check what format public key must have to make verify signature work
-    payload = jwt.decode(token, public_key, algorithms=["RS256"], options={"verify_signature": False})  # sub - authentication id
-
-    # user_id = request.args.get('id')
-    req_data = request.form # user email - unique 
-
-    auth_id = payload["sub"]
-    email = req_data["email"]
-
-    # if not in DB - create, if in DB - update
-    # add error handling based on the error type returned
     try:
-        user_object = userDB.insert_user(user(auth_id, email, "", ""))
-    
-    except Exception as e:
-        print(e)
+        auth_id = decode_auth_token(request)
 
-    user_object = userDB.get_user_by_email(email)
+        # JWT token is validated
+        if not auth_id == False:
 
-    return user_object
+            req_data = request.form # user email - unique 
+            email = req_data["email"]
 
+            # if not in DB - create, if in DB - update
+            # add error handling based on the error type returned
+            try:
+                user_object = userDB.insert_user(user(auth_id, email, "", ""))
+            
+            except Exception as e:
+                print(str(e))
 
-@app.route('/user/update', methods=['PUT'])
-def update_user():
-    req_data = request.form
-    user_id = req_data["id"]
-    
-    try:
-        update_status = userDB.update_user_by_id(user_id, req_data)
+            user_object = userDB.get_user_by_email(email)
 
-        if update_status:
-            return {"status": "User successfully updated", "id": user_id}, 200
+            return user_object
+        
+        # JWT token is not validated
         else:
-            return {"status": "Update failed", "id": user_id}, 500
+            return abort(401)
+            
     except Exception as e:
         return {"status": "An error occurred", "message": str(e)}, 500
+
+
+# update user data / protected API calls
+@app.route('/user/update', methods=['PUT'])
+def update_user():
+    try:
+        auth_id = decode_auth_token(request)
+
+        # JWT token is validated
+        if not auth_id == False:
+
+            req_data = request.form 
+
+            update_status = userDB.update_user_by_id(auth_id, req_data)
+
+            if update_status:
+                return {"status": "User successfully updated", "id": auth_id}, 200
+            else:
+                return {"status": "Update failed", "id": auth_id}, 500
+
+        else:
+            abort(401)
+        
+    except Exception as e:
+        return {"status": "An error occurred", "message": str(e)}, 500
+
 
 # ################################################
 # ######     MAINTENANCE DATABASE INTERACTIONS

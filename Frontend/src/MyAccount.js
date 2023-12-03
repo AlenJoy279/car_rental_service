@@ -10,7 +10,7 @@ import { withAuthenticationRequired } from "@auth0/auth0-react";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import axios from 'axios';
 import { useAuth0 } from '@auth0/auth0-react';
-
+import { Alert } from "@mui/material";
 
 import Home from "./Home";
 import { upsertUser, updateUser } from "./API"
@@ -31,7 +31,13 @@ const MyAccount = () => {
         user_id: 0,
         token: "",  
       }
+    ) 
 
+    const [apiState, setApiState] = useState(
+      {
+        error: false,
+        message: "",  
+      }
     ) 
 
     const [formData, setFormData] = useState({
@@ -78,7 +84,7 @@ const MyAccount = () => {
 
           } catch (error) {
             console.error("Error fetching user data:", error);
-            // Handle errors
+            setApiState({error:true, message:"Error fetching user data"})
           }
         };
 
@@ -100,7 +106,7 @@ const MyAccount = () => {
     };
 
 
-    // validate inputs
+    // validate inputs and show hints to users
     const checkErrors = () => {
       let errors = {};
 
@@ -160,11 +166,10 @@ const MyAccount = () => {
             {full_name: formData.fullName, phone: formData.phoneNumber}
           );
 
-          // On success
+          // On success & upon error
           console.log('User data updated:', response.data);
         } catch (error) {
             console.error("Error updating user data:", error);
-            // Handle errors - tbd
         }
       }
     };
@@ -172,6 +177,9 @@ const MyAccount = () => {
       return (
         <ThemeProvider theme={defaultTheme}>
         <Container component="main" maxWidth="xs">
+        
+        {apiState.error?<Alert severity="error" onClose={() => {setApiState({error:false})}}>{apiState.message}</Alert>:<></>}
+        
         <Box
               sx={{
                 marginTop: 8,
@@ -245,6 +253,8 @@ const MyAccount = () => {
       );
 }    
 
+
+// check if auntheticated, if not -> MyAcocunt wouldn't be available
 export default withAuthenticationRequired(MyAccount, {
     onRedirecting: () => <Home/>
 })
