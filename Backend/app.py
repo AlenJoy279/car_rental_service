@@ -85,7 +85,7 @@ def update_car():
     return {"status": "Car successfully updated", "id": req_data['id']}
 
 
-@app.route('/vehicles/manufacturers')  # Populate the list of possible makes for Search.js
+@app.route('/vehicles/manufacturers', methods=['GET'])  # Populate the list of possible makes for Search.js
 def get_all_manufacturers():
     cursor = carDB.conn.cursor()
     cursor.execute("SELECT DISTINCT make FROM Cars")
@@ -93,7 +93,7 @@ def get_all_manufacturers():
     return jsonify(manufacturers)
 
 
-@app.route('/vehicles/bodytypes')  # Populate the list of possible types for Search.js
+@app.route('/vehicles/bodytypes', methods=['GET'])  # Populate the list of possible types for Search.js
 def get_all_body_types():
     cursor = carDB.conn.cursor()
     cursor.execute("SELECT DISTINCT type FROM Cars")
@@ -101,33 +101,41 @@ def get_all_body_types():
     return jsonify(body_types)
 
 
-@app.route('/api/search')
+@app.route('/api/search', methods=['GET'])
 def search_cars():
     # Extract query parameters
-    # Using parametrised queries to prevent SQL injection
     start_date = request.args.get('startDate')
     end_date = request.args.get('endDate')
     pick_up_location = request.args.get('pickUpLocation')
     drop_off_point = request.args.get('dropOffPoint')
-    # More params
+    brands = request.args.get('brands')
+    types = request.args.get('types')
+    sort_by = request.args.get('sortBy')
 
     query = "SELECT * FROM Cars WHERE status='available'"
     conditions = []
+    params = []
 
-    # if start_date:
-    #     conditions.append("start_date >= :start_date")
-    # if end_date:
-    #     conditions.append("end_date <= :end_date")
-    # More conditions
+    if brands:
+        brands_list = brands.split(',')
+        conditions.append("make IN ({})".format(", ".join(["?"] * len(brands_list))))
+        params.extend(brands_list)
+
+    if types:
+        types_list = types.split(',')
+        conditions.append("type IN ({})".format(", ".join(["?"] * len(types_list))))
+        params.extend(types_list)
 
     if conditions:
         query += " AND " + " AND ".join(conditions)
 
+    if sort_by and sort_by in ["price_per_day", "year", "make"]:
+        query += " ORDER BY {}".format(sort_by)
+
     try:
         cursor = carDB.conn.cursor()
-        cursor.execute(query)
-        column_names = ['car_id', 'make', 'model', 'year', 'type', 'transmission', 'powertrain', 'vin_number', 'seats',
-                        'cargo_capacity', 'status', 'price_per_day', 'range']
+        cursor.execute(query, params)
+        column_names = ['car_id', 'make', 'model', 'year', 'type', 'transmission', 'powertrain', 'vin_number', 'seats', 'cargo_capacity', 'status', 'price_per_day', 'range']
         results = fetchall_conversion(column_names, cursor.fetchall())
         return jsonify(results)  # Convert results to JSON and return
     except Exception as e:

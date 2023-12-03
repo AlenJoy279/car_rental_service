@@ -30,7 +30,7 @@ export default function Search() {
     const navigate = useNavigate();
     const [startDate, setStartDate] = React.useState(null);
     const [endDate, setEndDate] = React.useState(null);
-    const [sortBy, setSortBy] = React.useState('');
+    const [sortBy, setSortBy] = React.useState('make');
     const [selectedBrands, setSelectedBrands] = React.useState([]);
     const [selectedTypes, setSelectedTypes] = React.useState([]);
     const [manufacturers, setManufacturers] = React.useState([]);
@@ -173,6 +173,21 @@ export default function Search() {
               autoComplete="drop-off point"
             />
 
+            <InputLabel id="sortByLabel">Sort by</InputLabel>
+              <Select
+                labelId="sortByLabel"
+                id="demoSort"
+                value={sortBy}
+                onChange={handleSortChange}
+                fullWidth
+              >
+                <MenuItem value={"make"}>Name</MenuItem>
+                <MenuItem value={"price_per_day"}>Price Per Day (dsc)</MenuItem>
+                <MenuItem value={"year"}>Year</MenuItem>
+                <MenuItem value={"Cargo capacity"}>Cargo Capacity</MenuItem>
+              </Select>
+
+
             <Accordion>
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
@@ -183,20 +198,6 @@ export default function Search() {
               </AccordionSummary>
               <AccordionDetails>
                 <Stack spacing={1.5}>
-                  <InputLabel id="sortByLabel">Sort by</InputLabel>
-                  <Select
-                    labelId="sortByLabel"
-                    id="demoSort"
-                    value={sortBy}
-                    onChange={handleSortChange}
-                    fullWidth
-                  >
-                    <MenuItem value={"Name"}>Name</MenuItem>
-                    <MenuItem value={"Price per day(asc)"}>Price Per Day (asc)</MenuItem>
-                    <MenuItem value={"Price per day(dsc)"}>Price Per Day (dsc)</MenuItem>
-                    <MenuItem value={"Highest rated"}>Highest Rated</MenuItem>
-                    <MenuItem value={"Cargo capacity"}>Cargo Capacity</MenuItem>
-                  </Select>
 
                   <InputLabel id="manufacturerChipSelLabel">Brand(s)</InputLabel>
                   <Select

@@ -25,7 +25,9 @@ function SearchResults() {
       endDate: searchParams.get('endDate'),
       pickUpLocation: searchParams.get('pickUpLocation'),
       dropOffPoint: searchParams.get('dropOffPoint'),
-
+      sortBy: searchParams.get('sortBy'),
+      brands: searchParams.get('brands'),
+      types: searchParams.get('types')
       // More params as needed
     };
 
